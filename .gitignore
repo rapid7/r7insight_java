@@ -1,0 +1,15 @@
+.directory
+/target
+.project
+.classpath
+.cache
+/.settings
+lib
+.idea
+*.iml
+release.properties
+*.db
+.DS_Store
+
+# IDEA files
+atlassian-ide-plugin.xml

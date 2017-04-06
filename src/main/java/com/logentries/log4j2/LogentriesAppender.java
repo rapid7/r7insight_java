@@ -33,6 +33,7 @@ public final class LogentriesAppender extends AbstractAppender
     @PluginFactory
     public static LogentriesAppender createAppender(@PluginAttribute("name") String name,
                                                     @PluginAttribute("token") String token,
+                                                    @PluginAttribute("region") String region,
                                                     @PluginAttribute("key") String key,
                                                     @PluginAttribute("location") String location,
                                                     @PluginAttribute("httpPut") boolean httpPut,
@@ -59,11 +60,14 @@ public final class LogentriesAppender extends AbstractAppender
             LOGGER.error("No token provided for LogentriesAppender");
             return null;
         }
-        FactoryData data = new FactoryData(token,
-                key, location, httpPut, ssl, debug,
-                useDataHub, dataHubAddr,
-                dataHubPort, logHostName, hostName,
-                logID);
+        if (region == null)
+        {
+            LOGGER.error("No region provided for LogentriesAppender");
+            return null;
+        }
+        FactoryData data = new FactoryData(token, region, key, location,
+                httpPut, ssl, debug, useDataHub, dataHubAddr, dataHubPort,
+                logHostName, hostName, logID);
         LogentriesManager manager = LogentriesManager.getManager(name, data);
         if (manager == null)
             return null;

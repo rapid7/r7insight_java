@@ -30,6 +30,7 @@ public final class LogentriesHandler extends Handler {
     private String host;
     private int port;
     private byte[] token;
+    private String region;
     private boolean open;
     private SocketChannel channel;
     private ByteBuffer buffer;
@@ -65,6 +66,15 @@ public final class LogentriesHandler extends Handler {
     public void setToken(byte[] token) {
         this.token = token;
     }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
 
     @Override
     public synchronized void publish(LogRecord record) {
@@ -136,9 +146,14 @@ public final class LogentriesHandler extends Handler {
         String cname = getClass().getName();
         setLevel(getLevelProperty(cname + ".level", Level.INFO));
         setFormatter(getFormatterProperty(cname + ".formatter", new SimpleFormatter()));
-        setHost(getStringProperty(cname + ".host", "data.logentries.com"));
+        setHost(getStringProperty(cname + ".host", null));
         setPort(getIntProperty(cname + ".port", 514));
         setToken(getBytesProperty(cname + ".token", ""));
+        setRegion(getStringProperty(cname + ".region", ""));
+
+        if (host == null || host.isEmpty()) {
+            setHost(String.format("data.%s.logentries.com", region));
+        }
     }
 
     void connect() {

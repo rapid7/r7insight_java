@@ -38,6 +38,7 @@ public class LogentriesManager extends AbstractManager
         super(loggerContext, name);
         asyncLogger = new AsyncLogger();
         asyncLogger.setToken(data.getToken());
+        asyncLogger.setRegion(data.getRegion());
         asyncLogger.setKey(data.getKey());
         asyncLogger.setLocation(nullToEmpty(data.getLocation()));
         asyncLogger.setHttpPut(data.isHttpPut());

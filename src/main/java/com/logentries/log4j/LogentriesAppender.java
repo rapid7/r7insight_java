@@ -35,11 +35,20 @@ public class LogentriesAppender extends AppenderSkeleton {
 	public void setToken( String token) {
 		this.le_async.setToken(token);
 	}
+
+	/**
+	 * Sets the region
+	 *
+	 * @param region
+	 */
+	public void setRegion( String region) {
+		this.le_async.setRegion(region);
+	}
 	
 	/**
 	 *  Sets the HTTP PUT boolean flag. Send logs via HTTP PUT instead of default Token TCP
 	 *  
-	 *  @param httpput HttpPut flag to set
+	 *  @param HttpPut HttpPut flag to set
 	 */
 	public void setHttpPut( boolean HttpPut) {
 		this.le_async.setHttpPut(HttpPut);

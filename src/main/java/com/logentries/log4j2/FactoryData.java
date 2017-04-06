@@ -8,6 +8,8 @@ class FactoryData
 
     /** Destination Token. */
     private final String token;
+    /** Destination Region. */
+    private final String region;
     /** Account Key. */
     private final String key;
     /** Account Log Location. */
@@ -31,11 +33,12 @@ class FactoryData
     /** LogID - user-defined ID string that is appended to the log message if non-empty. */
     private final String logID;
 
-    FactoryData(String token, String key, String location, boolean httpPut, boolean ssl, boolean debug,
-                boolean useDataHub, String dataHubAddr, int dataHubPort, boolean logHostName,
+    FactoryData(String token, String region, String key, String location, boolean httpPut, boolean ssl,
+                boolean debug, boolean useDataHub, String dataHubAddr, int dataHubPort, boolean logHostName,
                 String hostName, String logID)
     {
         this.token = token;
+        this.region = region;
         this.key = key;
         this.location = location;
         this.httpPut = httpPut;
@@ -107,5 +110,9 @@ class FactoryData
     public String getLogID()
     {
         return logID;
+    }
+
+    public String getRegion() {
+        return region;
     }
 }

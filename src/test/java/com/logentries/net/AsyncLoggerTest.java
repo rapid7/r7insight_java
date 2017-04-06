@@ -20,6 +20,15 @@ public class AsyncLoggerTest {
 	}
 
 	@Test
+	public void testGetAndSetRegion()
+	{
+		AsyncLogger async = new AsyncLogger();
+		assertEquals("token should be empty string by default", async.getRegion(), null);
+		async.setRegion("someRegion");
+		assertEquals("getToken should return correct token", async.getRegion(), "someRegion");
+	}
+
+	@Test
     public void testOversizeMessage()
     {
         AsyncLogger async = new AsyncLogger();
@@ -80,10 +89,23 @@ public class AsyncLoggerTest {
 	}
 
 	@Test
+	public void testCheckCredentialsMissingRegion()
+	{
+		AsyncLogger async = new AsyncLogger();
+		async.setToken(VALID_UUID);
+		assertFalse("checkCredentials should return false for null region", async.checkCredentials());
+		async.setRegion("");
+		assertFalse("checkCredentials should return false for empty region", async.checkCredentials());
+		async.setRegion("someRegion");
+		assertTrue("checkCredentials should return true for a non-empty region string", async.checkCredentials());
+	}
+
+	@Test
 	public void testCheckCredentialsValidToken()
 	{
 		AsyncLogger async = new AsyncLogger();
 		async.setToken("not-a-uuid");
+		async.setRegion("someRegion");
 		assertFalse("checkCredentials should return false for invalid token", async.checkCredentials());
 		async.setToken(VALID_UUID);
 		assertTrue("checkCredentials should return true for valid token", async.checkCredentials());
@@ -103,6 +125,7 @@ public class AsyncLoggerTest {
 	{
 		AsyncLogger async = new AsyncLogger();
 		async.setHttpPut(true);
+		async.setRegion("someRegion");
 		async.setKey("not-a-uuid");
 		async.setLocation("anywhere");
 		assertFalse("checkCredentials should return false for invalid key", async.checkCredentials());
@@ -115,6 +138,7 @@ public class AsyncLoggerTest {
 	{
 		AsyncLogger async = new AsyncLogger();
 		async.setHttpPut(true);
+		async.setRegion("someRegion");
 		async.setKey(VALID_UUID);
 		assertFalse("checkCredentials should return false for empty location", async.checkCredentials());
 		async.setLocation("anywhere");

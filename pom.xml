@@ -15,10 +15,10 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.logentries</groupId>
-    <artifactId>logentries-appender</artifactId>
+    <groupId>com.rapid7</groupId>
+    <artifactId>r7insight_java</artifactId>
     <packaging>jar</packaging>
-    <name>Logentries Appender</name>
+    <name>r7insight_java</name>
     <version>1.1.38-SNAPSHOT</version>
     <description>Contains logback, log4j, and log4j2 appenders that will send log data to Logentries</description>
     <url>https://github.com/logentries/le_java</url>
@@ -30,9 +30,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:logentries/le_java.git</connection>
-        <developerConnection>scm:git:git@github.com:logentries/le_java.git</developerConnection>
-        <url>https://github.com/logentries/le_java</url>
+        <connection>scm:git:git@github.com:rapid7/r7insight_java.git</connection>
+        <developerConnection>scm:git:git@github.com:rapid7/r7insight_java.git</developerConnection>
+        <url>https://github.com/rapid7/r7insight_java</url>
     </scm>
     <developers>
         <developer>

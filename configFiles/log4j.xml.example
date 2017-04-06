@@ -4,6 +4,7 @@
 	<appender name="le" class="com.logentries.log4j.LogentriesAppender">
 		<!-- Enter your Logentries token, like bc0c4f90-a2d6-11e1-b3dd-0800200c9a66 -->
 		<param name="Token" value="LOGENTRIES_TOKEN" />
+		<param name="Region" value="eu" />
 		<param name="Debug" value="false" />
 		<param name="Ssl" value="false" />
 		<layout class="org.apache.log4j.PatternLayout">

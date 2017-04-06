@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 public class LogentriesAppenderTest {
 
     private static final String token = "some-token";
+    private static final String region = "some-region";
     private static final String location = "some location";
     private static final String accountKey = "account key";
     private AsyncLogger client;
@@ -27,12 +28,14 @@ public class LogentriesAppenderTest {
 
         le.setHttpPut(doPut);
         le.setToken(token);
+        le.setRegion(region);
         le.setLocation(location);
         le.setKey(accountKey);
         le.setSsl(useSSL);
 
         Mockito.verify(client).setHttpPut(doPut);
         Mockito.verify(client).setToken(token);
+        Mockito.verify(client).setRegion(region);
         Mockito.verify(client).setLocation(location);
         Mockito.verify(client).setKey(accountKey);
         Mockito.verify(client).setSsl(useSSL);

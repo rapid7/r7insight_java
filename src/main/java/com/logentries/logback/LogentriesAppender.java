@@ -66,10 +66,19 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
 	}
 
 	/**
+	 * Sets the region.
+	 *
+	 * @param region
+	 */
+	public void setRegion(String region) {
+		this.le_async.setRegion(region);
+	}
+
+	/**
 	 * Sets the HTTP PUTflag. <p>Send logs via HTTP PUT instead of default Token
 	 * TCP.</p>
 	 *
-	 * @param httpput true to use HTTP PUT API
+	 * @param HttpPut true to use HTTP PUT API
 	 */
 	public void setHttpPut(boolean HttpPut) {
 		this.le_async.setHttpPut(HttpPut);

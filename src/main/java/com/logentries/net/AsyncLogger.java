@@ -48,6 +48,7 @@ public class AsyncLogger {
 	private static final String LINE_SEP = System.getProperty("line_separator", "\n");
 	/** Error message displayed when invalid API key is detected. */
 	private static final String INVALID_TOKEN = "\n\nIt appears your LOGENTRIES_TOKEN parameter in log4j.xml is incorrect!\n\n";
+	private static final String INVALID_REGION = "\n\nMissing REGION parameter in logger configuration.\n\n";
 	/** Key Value for Token Environment Variable. */
 	private static final String CONFIG_TOKEN = "LOGENTRIES_TOKEN";
 	/** Error message displayed when queue overflow occurs */
@@ -64,6 +65,9 @@ public class AsyncLogger {
 
 	/** Destination Token. */
 	String token = "";
+
+	/** Region. */
+	String region;
 	/** Account Key. */
 	String key = "";
 	/** Account Log Location. */
@@ -117,6 +121,14 @@ public class AsyncLogger {
 	 */
 	public String getToken() {
 		return token;
+	}
+
+	public String getRegion() {
+		return region;
+	}
+
+	public void setRegion(String region) {
+		this.region = region;
 	}
 
 	/**
@@ -357,6 +369,10 @@ public class AsyncLogger {
 		return true;
 	}
 
+	boolean isNullOrEmpty(String str) {
+		return str == null || str.isEmpty();
+	}
+
 	/**
 	 * Try and retrieve environment variable for given key, return empty string if not found
 	 */
@@ -372,30 +388,28 @@ public class AsyncLogger {
 	 * Checks that key and location are set.
 	 */
 	boolean checkCredentials() {
+		if (isNullOrEmpty(region)) {
+			dbg(INVALID_REGION);
+			return false;
+		}
 
-
-		if(!httpPut)
-		{
-			if (token.equals(CONFIG_TOKEN) || token.equals(""))
-			{
+		if (!httpPut) {
+			if (token.equals(CONFIG_TOKEN) || token.equals("")) {
 				//Check if set in an environment variable, used with PaaS providers
-				String envToken = getEnvVar( CONFIG_TOKEN);
-
-				if (envToken == ""){
+				String envToken = getEnvVar(CONFIG_TOKEN);
+				if (envToken.equals("")) {
 					dbg(INVALID_TOKEN);
 					return false;
 				}
-
 				this.setToken(envToken);
 			}
-
 			return checkValidUUID(this.getToken());
-		}else{
-			if ( !checkValidUUID(this.getKey()) || this.getLocation().equals(""))
+		} else {
+			if (!checkValidUUID(this.getKey()) || this.getLocation().equals(""))
 				return false;
-
-			return true;
 		}
+
+		return true;
 	}
 
 	/**
@@ -507,7 +521,7 @@ public class AsyncLogger {
 		void openConnection() throws IOException {
 			try{
 				if(this.le_client == null){
-					this.le_client = new LogentriesClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort);
+					this.le_client = new LogentriesClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
 				}
 
 				this.le_client.connect();

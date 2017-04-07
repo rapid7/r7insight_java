@@ -7,17 +7,14 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import static java.util.logging.ErrorManager.CLOSE_FAILURE;
-import static java.util.logging.ErrorManager.FORMAT_FAILURE;
-import static java.util.logging.ErrorManager.GENERIC_FAILURE;
-import static java.util.logging.ErrorManager.OPEN_FAILURE;
-import static java.util.logging.ErrorManager.WRITE_FAILURE;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
+
+import static java.util.logging.ErrorManager.*;
 
 /**
  * <code>LogentriesHandler</code>: A handler for writing formatted records to a
@@ -27,6 +24,8 @@ import java.util.logging.SimpleFormatter;
  */
 public final class LogentriesHandler extends Handler {
 
+    private final byte[] newline = {0x0D, 0x0A};
+    private final byte space = 0x020;
     private String host;
     private int port;
     private byte[] token;
@@ -34,8 +33,6 @@ public final class LogentriesHandler extends Handler {
     private boolean open;
     private SocketChannel channel;
     private ByteBuffer buffer;
-    private final byte[] newline = {0x0D, 0x0A};
-    private final byte space = 0x020;
 
     public LogentriesHandler() {
         configure();
@@ -134,7 +131,7 @@ public final class LogentriesHandler extends Handler {
         while (buffer.hasRemaining()) {
             try {
                 channel.write(buffer);
-            } catch (Exception  e) {
+            } catch (Exception e) {
                 reportError("Error while writing channel.", e, WRITE_FAILURE);
                 return false;
             }
@@ -162,13 +159,14 @@ public final class LogentriesHandler extends Handler {
             channel.connect(new InetSocketAddress(host, port));
             open = true;
         } catch (IOException e) {
-            open = false; 
+            open = false;
             reportError(MessageFormat.format("Error connection to host: {0}:{1}", host, port), e, OPEN_FAILURE);
         }
     }
-    
+
     @Override
-    public void flush() {}
+    public void flush() {
+    }
 
     @Override
     public void close() throws SecurityException {
@@ -182,9 +180,9 @@ public final class LogentriesHandler extends Handler {
             }
         }
     }
-    
+
     // -- These methods are private in LogManager
-    
+
     Level getLevelProperty(String name, Level defaultValue) {
         LogManager manager = LogManager.getLogManager();
         String val = manager.getProperty(name);

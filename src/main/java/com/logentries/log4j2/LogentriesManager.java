@@ -1,40 +1,21 @@
 package com.logentries.log4j2;
 
-import java.util.concurrent.TimeUnit;
-
+import com.logentries.net.AsyncLogger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.AbstractManager;
 import org.apache.logging.log4j.core.appender.ManagerFactory;
-import org.apache.logging.log4j.core.async.AsyncLoggerContext;
 
-import com.logentries.net.AsyncLogger;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Responsible for managing the actual connection to Logentries.
  * Created by josh on 11/15/14.
  */
-public class LogentriesManager extends AbstractManager
-{
+public class LogentriesManager extends AbstractManager {
     private static LogentriesManagerFactory FACTORY = new LogentriesManagerFactory();
-
-    static LogentriesManager getManager(String name, FactoryData data)
-    {
-        return getManager(name, FACTORY, data);
-    }
-
-    static class LogentriesManagerFactory implements ManagerFactory<LogentriesManager, FactoryData>
-    {
-        @Override
-        public LogentriesManager createManager(String name, FactoryData data)
-        {
-            return new LogentriesManager(new LoggerContext(name), name, data);
-        }
-    }
-
     private final AsyncLogger asyncLogger;
 
-    protected LogentriesManager(LoggerContext loggerContext, String name, FactoryData data)
-    {
+    protected LogentriesManager(LoggerContext loggerContext, String name, FactoryData data) {
         super(loggerContext, name);
         asyncLogger = new AsyncLogger();
         asyncLogger.setToken(data.getToken());
@@ -55,22 +36,30 @@ public class LogentriesManager extends AbstractManager
         LOGGER.debug("AsyncLogger created.");
     }
 
-    private String nullToEmpty(String s)
-    {
+    static LogentriesManager getManager(String name, FactoryData data) {
+        return getManager(name, FACTORY, data);
+    }
+
+    private String nullToEmpty(String s) {
         return s == null ? "" : s;
     }
 
     @Override
-    protected boolean releaseSub(final long timeout, final TimeUnit timeUnit)
-    {
+    protected boolean releaseSub(final long timeout, final TimeUnit timeUnit) {
         asyncLogger.close();
         LOGGER.debug("AsyncLogger closed.");
         return true;
     }
 
-    public void writeLine(String line)
-    {
+    public void writeLine(String line) {
         asyncLogger.addLineToQueue(line);
+    }
+
+    static class LogentriesManagerFactory implements ManagerFactory<LogentriesManager, FactoryData> {
+        @Override
+        public LogentriesManager createManager(String name, FactoryData data) {
+            return new LogentriesManager(new LoggerContext(name), name, data);
+        }
     }
 
 }

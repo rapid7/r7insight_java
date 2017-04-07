@@ -14,7 +14,7 @@ import java.net.Socket;
  */
 public class LogentriesClient {
     /*
-	 * Constants
+     * Constants
 	 */
 
     /**

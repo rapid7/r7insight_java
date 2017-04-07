@@ -3,40 +3,64 @@ package com.logentries.log4j2;
 /**
  * Factory Data.
  */
-class FactoryData
-{
+class FactoryData {
 
-    /** Destination Token. */
+    /**
+     * Destination Token.
+     */
     private final String token;
-    /** Destination Region. */
+    /**
+     * Destination Region.
+     */
     private final String region;
-    /** Account Key. */
+    /**
+     * Account Key.
+     */
     private final String key;
-    /** Account Log Location. */
+    /**
+     * Account Log Location.
+     */
     private final String location;
-    /** HttpPut flag. */
+    /**
+     * HttpPut flag.
+     */
     private final boolean httpPut;
-    /** SSL/TLS flag. */
+    /**
+     * SSL/TLS flag.
+     */
     private final boolean ssl;
-    /** Debug flag. */
+    /**
+     * Debug flag.
+     */
     private final boolean debug;
-    /** UseDataHub flag. */
+    /**
+     * UseDataHub flag.
+     */
     private final boolean useDataHub;
-    /** DataHubAddr - address of the server where DataHub instance resides. */
+    /**
+     * DataHubAddr - address of the server where DataHub instance resides.
+     */
     private final String dataHubAddr;
-    /** DataHubPort - port on which DataHub instance waits for messages. */
+    /**
+     * DataHubPort - port on which DataHub instance waits for messages.
+     */
     private final int dataHubPort;
-    /** LogHostName - switch that determines whether HostName should be appended to the log message. */
+    /**
+     * LogHostName - switch that determines whether HostName should be appended to the log message.
+     */
     private final boolean logHostName;
-    /** HostName - value, that should be appended to the log message if logHostName is set to true. */
+    /**
+     * HostName - value, that should be appended to the log message if logHostName is set to true.
+     */
     private final String hostName;
-    /** LogID - user-defined ID string that is appended to the log message if non-empty. */
+    /**
+     * LogID - user-defined ID string that is appended to the log message if non-empty.
+     */
     private final String logID;
 
     FactoryData(String token, String region, String key, String location, boolean httpPut, boolean ssl,
                 boolean debug, boolean useDataHub, String dataHubAddr, int dataHubPort, boolean logHostName,
-                String hostName, String logID)
-    {
+                String hostName, String logID) {
         this.token = token;
         this.region = region;
         this.key = key;
@@ -52,63 +76,51 @@ class FactoryData
         this.logID = logID;
     }
 
-    public String getToken()
-    {
+    public String getToken() {
         return token;
     }
 
-    public String getKey()
-    {
+    public String getKey() {
         return key;
     }
 
-    public String getLocation()
-    {
+    public String getLocation() {
         return location;
     }
 
-    public boolean isHttpPut()
-    {
+    public boolean isHttpPut() {
         return httpPut;
     }
 
-    public boolean isSsl()
-    {
+    public boolean isSsl() {
         return ssl;
     }
 
-    public boolean isDebug()
-    {
+    public boolean isDebug() {
         return debug;
     }
 
-    public boolean isUseDataHub()
-    {
+    public boolean isUseDataHub() {
         return useDataHub;
     }
 
-    public String getDataHubAddr()
-    {
+    public String getDataHubAddr() {
         return dataHubAddr;
     }
 
-    public int getDataHubPort()
-    {
+    public int getDataHubPort() {
         return dataHubPort;
     }
 
-    public boolean isLogHostName()
-    {
+    public boolean isLogHostName() {
         return logHostName;
     }
 
-    public String getHostName()
-    {
+    public String getHostName() {
         return hostName;
     }
 
-    public String getLogID()
-    {
+    public String getLogID() {
         return logID;
     }
 

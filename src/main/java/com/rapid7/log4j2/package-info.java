@@ -3,4 +3,4 @@
  * <p>
  * Created by josh on 11/15/14.
  */
-package com.logentries.log4j2;
+package com.rapid7.log4j2;

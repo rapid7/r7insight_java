@@ -1,4 +1,4 @@
-package com.logentries.log4j2;
+package com.rapid7.log4j2;
 
 /**
  * Factory Data.

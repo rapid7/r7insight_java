@@ -1,6 +1,6 @@
-package com.logentries.log4j2;
+package com.rapid7.log4j2;
 
-import com.logentries.net.AsyncLogger;
+import com.rapid7.net.AsyncLogger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.AbstractManager;
 import org.apache.logging.log4j.core.appender.ManagerFactory;

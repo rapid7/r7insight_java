@@ -1,6 +1,6 @@
-package com.logentries.logback;
+package com.rapid7.logback;
 
-import com.logentries.net.AsyncLogger;
+import com.rapid7.net.AsyncLogger;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.logentries.net;
+package com.rapid7.net;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;

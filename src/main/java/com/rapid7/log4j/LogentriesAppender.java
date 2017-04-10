@@ -1,6 +1,6 @@
-package com.logentries.log4j;
+package com.rapid7.log4j;
 
-import com.logentries.net.AsyncLogger;
+import com.rapid7.net.AsyncLogger;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 

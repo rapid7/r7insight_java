@@ -1,4 +1,4 @@
-package com.logentries.net;
+package com.rapid7.net;
 
 import java.io.IOException;
 import java.net.InetAddress;

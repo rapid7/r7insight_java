@@ -6,8 +6,9 @@
         </encoder>
     </appender>
 
-    <appender name="LE" class="com.logentries.logback.LogentriesAppender">
+    <appender name="LE" class="com.rapid7.logback.LogentriesAppender">
         <Token>*</Token>
+        <Regio>eu</Regio>
         <Debug>False</Debug>
         <Ssl>False</Ssl>
         <facility>USER</facility>

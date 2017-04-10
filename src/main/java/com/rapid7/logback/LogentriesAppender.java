@@ -1,4 +1,4 @@
-package com.logentries.logback;
+package com.rapid7.logback;
 
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
@@ -7,7 +7,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.net.SyslogConstants;
-import com.logentries.net.AsyncLogger;
+import com.rapid7.net.AsyncLogger;
 
 /**
  * Logentries appender for logback.

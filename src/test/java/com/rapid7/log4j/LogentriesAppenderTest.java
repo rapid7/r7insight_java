@@ -1,4 +1,4 @@
-package com.logentries.log4j;
+package com.rapid7.log4j;
 
 import org.junit.Test;
 

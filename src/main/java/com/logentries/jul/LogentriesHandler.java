@@ -14,7 +14,12 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
-import static java.util.logging.ErrorManager.*;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.logging.ErrorManager.CLOSE_FAILURE;
+import static java.util.logging.ErrorManager.FORMAT_FAILURE;
+import static java.util.logging.ErrorManager.GENERIC_FAILURE;
+import static java.util.logging.ErrorManager.OPEN_FAILURE;
+import static java.util.logging.ErrorManager.WRITE_FAILURE;
 
 /**
  * <code>LogentriesHandler</code>: A handler for writing formatted records to a
@@ -143,14 +148,17 @@ public final class LogentriesHandler extends Handler {
         String cname = getClass().getName();
         setLevel(getLevelProperty(cname + ".level", Level.INFO));
         setFormatter(getFormatterProperty(cname + ".formatter", new SimpleFormatter()));
-        setHost(getStringProperty(cname + ".host", null));
-        setPort(getIntProperty(cname + ".port", 514));
-        setToken(getBytesProperty(cname + ".token", ""));
         setRegion(getStringProperty(cname + ".region", ""));
 
-        if (host == null || host.isEmpty()) {
+        String hostProperty = getStringProperty(cname + ".host", null);
+        if (isNullOrEmpty(hostProperty)) {
             setHost(String.format("data.%s.logentries.com", region));
+        } else {
+            setHost(hostProperty);
         }
+
+        setPort(getIntProperty(cname + ".port", 514));
+        setToken(getBytesProperty(cname + ".token", ""));
     }
 
     void connect() {

@@ -9,6 +9,8 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.regex.Pattern;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 /**
  * Logentries Asynchronous Logger for integration with Java logging frameworks.
  * <p>
@@ -429,10 +431,6 @@ public class AsyncLogger {
         }
 
         return true;
-    }
-
-    boolean isNullOrEmpty(String str) {
-        return str == null || str.isEmpty();
     }
 
     /**

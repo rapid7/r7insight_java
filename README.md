@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/logentries/le_java.png?branch=master)](https://travis-ci.org/logentries/le_java)
+[![Build Status](https://travis-ci.org/rapid7/r7insight_java.png?branch=master)](https://travis-ci.org/rapid7/r7insight_java)
 
-[Please see our wiki for full documentation and installation](https://github.com/logentries/le_java/wiki)
+[Please see our wiki for full documentation and installation](https://github.com/rapid7/r7insight_java/wiki)
 -------
 
 Logging To Logentries from Java
@@ -8,10 +8,10 @@ Logging To Logentries from Java
 
 Logentries currently supports logging from Java using the following logging libraries:
 
-* [Log4J](https://github.com/logentries/le_java/wiki/Log4j)
-* [Log4J2](https://github.com/logentries/le_java/wiki/Log4j2)
-* [Logback](https://github.com/logentries/le_java/wiki/Logback)
-* [Java Util Logging](https://github.com/logentries/le_java/wiki/Java-Util-Logging)
+* [Log4J](https://github.com/rapid7/r7insight_java/wiki/Log4j)
+* [Log4J2](https://github.com/rapid7/r7insight_java/wiki/Log4j2)
+* [Logback](https://github.com/rapid7/r7insight_java/wiki/Logback)
+* [Java Util Logging](https://github.com/rapid7/r7insight_java/wiki/Java-Util-Logging)
 
 -------
 

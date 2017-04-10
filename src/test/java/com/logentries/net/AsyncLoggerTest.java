@@ -4,7 +4,9 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class AsyncLoggerTest {
 
@@ -21,9 +23,9 @@ public class AsyncLoggerTest {
     @Test
     public void testGetAndSetRegion() {
         AsyncLogger async = new AsyncLogger();
-        assertEquals("token should be empty string by default", async.getRegion(), null);
+        assertEquals("region should be empty string by default", async.getRegion(), null);
         async.setRegion("someRegion");
-        assertEquals("getToken should return correct token", async.getRegion(), "someRegion");
+        assertEquals("getRegion should return correct region", async.getRegion(), "someRegion");
     }
 
     @Test

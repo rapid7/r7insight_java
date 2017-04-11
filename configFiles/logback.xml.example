@@ -2,8 +2,9 @@
 <configuration>
 
 	<appender name="LE"
-		class="com.logentries.logback.LogentriesAppender">
+		class="com.rapid7.logback.LogentriesAppender">
 		<Token>LOGENTRIES_TOKEN</Token>
+		<Region>eu</Region>
 		<Debug>False</Debug>
 		<Ssl>False</Ssl>
 		<facility>USER</facility>

@@ -5,6 +5,7 @@
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss ZZZ} %F.%L level:%-5p%m"/>
             <name>le</name>
             <token>LOGENTRIES_TOKEN</token>
+            <region>eu</region>
             <debug>false</debug>
             <ignoreExceptions>false</ignoreExceptions>
             <logId></logId>

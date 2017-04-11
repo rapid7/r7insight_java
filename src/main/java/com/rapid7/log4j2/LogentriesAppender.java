@@ -1,4 +1,4 @@
-package com.logentries.log4j2;
+package com.rapid7.log4j2;
 
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
@@ -18,14 +18,12 @@ import java.io.Serializable;
  * Created by josh on 11/15/14.
  */
 @Plugin(name = "Logentries", category = "Core", elementType = "appender", printObject = true)
-public final class LogentriesAppender extends AbstractAppender
-{
+public final class LogentriesAppender extends AbstractAppender {
     private final LogentriesManager manager;
 
     protected LogentriesAppender(String name, Filter filter,
                                  Layout<? extends Serializable> layout, boolean ignoreExceptions,
-                                 LogentriesManager manager)
-    {
+                                 LogentriesManager manager) {
         super(name, filter, layout, ignoreExceptions);
         this.manager = manager;
     }
@@ -33,6 +31,7 @@ public final class LogentriesAppender extends AbstractAppender
     @PluginFactory
     public static LogentriesAppender createAppender(@PluginAttribute("name") String name,
                                                     @PluginAttribute("token") String token,
+                                                    @PluginAttribute("region") String region,
                                                     @PluginAttribute("key") String key,
                                                     @PluginAttribute("location") String location,
                                                     @PluginAttribute("httpPut") boolean httpPut,
@@ -46,24 +45,23 @@ public final class LogentriesAppender extends AbstractAppender
                                                     @PluginAttribute("logID") String logID,
                                                     @PluginAttribute("ignoreExceptions") boolean ignoreExceptions,
                                                     @PluginElement("Layout") Layout<? extends Serializable> layout,
-                                                    @PluginElement("Filters") Filter filter)
-    {
+                                                    @PluginElement("Filters") Filter filter) {
 
-        if (name == null)
-        {
+        if (name == null) {
             LOGGER.error("No name provided for LogentriesAppender");
             return null;
         }
-        if (token == null)
-        {
+        if (token == null) {
             LOGGER.error("No token provided for LogentriesAppender");
             return null;
         }
-        FactoryData data = new FactoryData(token,
-                key, location, httpPut, ssl, debug,
-                useDataHub, dataHubAddr,
-                dataHubPort, logHostName, hostName,
-                logID);
+        if (region == null) {
+            LOGGER.error("No region provided for LogentriesAppender");
+            return null;
+        }
+        FactoryData data = new FactoryData(token, region, key, location,
+                httpPut, ssl, debug, useDataHub, dataHubAddr, dataHubPort,
+                logHostName, hostName, logID);
         LogentriesManager manager = LogentriesManager.getManager(name, data);
         if (manager == null)
             return null;
@@ -75,8 +73,7 @@ public final class LogentriesAppender extends AbstractAppender
     }
 
     @Override
-    public void append(LogEvent event)
-    {
+    public void append(LogEvent event) {
         final Layout<? extends Serializable> layout = getLayout();
         String line = new String(layout.toByteArray(event));
         manager.writeLine(line);

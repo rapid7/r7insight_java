@@ -49,8 +49,8 @@ public class LogentriesClient {
             ssl_choice = ssl;
             http_choice = httpPut;
         }
-        dataEndpoint = String.format("data.%s.logentries.com", region);
-        httpEndpoint = String.format("api.%s.logentries.com", region);
+        dataEndpoint = String.format("%s.data.logs.insight.rapid7.com", region);
+        httpEndpoint = String.format("%s.api.logs.insight.rapid7.com", region);
     }
 
     public int getPort() {

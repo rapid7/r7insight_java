@@ -152,7 +152,7 @@ public final class LogentriesHandler extends Handler {
 
         String hostProperty = getStringProperty(cname + ".host", null);
         if (isNullOrEmpty(hostProperty)) {
-            setHost(String.format("data.%s.logentries.com", region));
+            setHost(String.format("%s.data.logs.insight.rapid7.com", region));
         } else {
             setHost(hostProperty);
         }

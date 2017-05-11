@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import static com.rapid7.Constants.HTTP_ENDPOINT_TEMPLATE;
+import static com.rapid7.Constants.DATA_ENDPOINT_TEMPLATE;
+
 /**
  * Client for sending messages to Logentries via HTTP PUT or Token-Based Logging
  * Supports SSL/TLS
@@ -49,8 +52,8 @@ public class LogentriesClient {
             ssl_choice = ssl;
             http_choice = httpPut;
         }
-        dataEndpoint = String.format("%s.data.logs.insight.rapid7.com", region);
-        httpEndpoint = String.format("%s.api.logs.insight.rapid7.com", region);
+        dataEndpoint = String.format(DATA_ENDPOINT_TEMPLATE, region);
+        httpEndpoint = String.format(HTTP_ENDPOINT_TEMPLATE, region);
     }
 
     public int getPort() {

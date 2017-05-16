@@ -15,6 +15,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.rapid7.Constants.DATA_ENDPOINT_TEMPLATE;
 import static java.util.logging.ErrorManager.CLOSE_FAILURE;
 import static java.util.logging.ErrorManager.FORMAT_FAILURE;
 import static java.util.logging.ErrorManager.GENERIC_FAILURE;
@@ -152,7 +153,7 @@ public final class LogentriesHandler extends Handler {
 
         String hostProperty = getStringProperty(cname + ".host", null);
         if (isNullOrEmpty(hostProperty)) {
-            setHost(String.format("data.%s.logentries.com", region));
+            setHost(String.format(DATA_ENDPOINT_TEMPLATE, region));
         } else {
             setHost(hostProperty);
         }

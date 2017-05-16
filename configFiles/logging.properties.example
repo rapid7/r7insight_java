@@ -4,5 +4,4 @@ handlers = com.rapid7.jul.LogentriesHandler
 com.rapid7.jul.LogentriesHandler.token = LOGENTRIES_TOKEN
 com.rapid7.jul.LogentriesHandler.region = eu
 com.rapid7.jul.LogentriesHandler.port = 10000
-com.rapid7.jul.LogentriesHandler.host = data.logentries.com
 com.rapid7.jul.LogentriesHandler.formatter = java.util.logging.SimpleFormatter

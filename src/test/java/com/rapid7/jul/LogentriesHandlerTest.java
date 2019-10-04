@@ -19,7 +19,7 @@ public class LogentriesHandlerTest {
     @Test
     public void singleLogger() throws Exception {
         final String message = "single logger test";
-        final String token = "2cb90b70-e5c8-436b-a7b1-15628325925c";
+        final String token = "token-logentries-handler";
         SocketChannelReceiver receiver = null;
         try {
             receiver = SocketChannelReceiver.createAndStartReceiver(10000);

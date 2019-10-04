@@ -8,6 +8,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
 public class LogentriesHandlerTest {
 
@@ -18,8 +19,8 @@ public class LogentriesHandlerTest {
 
     @Test
     public void singleLogger() throws Exception {
-        final String message = "single logger test";
-        final String token = "token-logentries-handler";
+        final String message = "a message to log";
+        final String token = "0c7407d4-fd0d-4436-bb50-44f1266b4490";
         SocketChannelReceiver receiver = null;
         try {
             receiver = SocketChannelReceiver.createAndStartReceiver(10000);
@@ -35,8 +36,8 @@ public class LogentriesHandlerTest {
 
     @Test
     public void multipleLoggers() throws Exception {
-        final String tokenLogger1 = "token-logger-1";
-        final String tokenLogger2 = "token-logger-2";
+        final String tokenLogger1 = "4ff1cb0a-beea-4616-b647-1c113de8e7bb";
+        final String tokenLogger2 = "a70d9089-576c-4668-9641-14995d493a62";
         final String messageLogger1 = "test message for logger_1";
         final String messageLogger2 = "test message for logger_2";
         SocketChannelReceiver receiverLogger1 = null;
@@ -59,6 +60,7 @@ public class LogentriesHandlerTest {
     }
 
     private void validateLogMessage(String token, String message, String logLine) {
+        assertTrue( "Log line length verification" , logLine.length() > token.length() + message.length());
         assertEquals("Token verification", token, logLine.split(" ")[0]);
         assertEquals("Log Message verification", message, logLine.substring(logLine.length() - message.length() - 1, logLine.length() - 1));
     }

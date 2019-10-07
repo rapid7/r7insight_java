@@ -58,6 +58,8 @@ public class SocketChannelReceiver {
         try {
             serverSocket.close();
         } catch (Exception e) {
+            System.out.println("Error closing server socket!");
+            e.printStackTrace();
         }
     }
 

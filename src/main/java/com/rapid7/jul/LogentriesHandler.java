@@ -41,7 +41,11 @@ public final class LogentriesHandler extends Handler {
     private ByteBuffer buffer;
 
     public LogentriesHandler() {
-        configure();
+        this(null);
+    }
+
+    public LogentriesHandler(String prefix) {
+        configure(prefix);
         connect();
         buffer = ByteBuffer.allocate(4096);
     }
@@ -145,21 +149,22 @@ public final class LogentriesHandler extends Handler {
         return true;
     }
 
-    void configure() {
+    void configure(String prefix) {
         String cname = getClass().getName();
-        setLevel(getLevelProperty(cname + ".level", Level.INFO));
-        setFormatter(getFormatterProperty(cname + ".formatter", new SimpleFormatter()));
-        setRegion(getStringProperty(cname + ".region", ""));
+        String propsPrefix = prefix == null ? cname : prefix + "." + cname;
+        setLevel(getLevelProperty(propsPrefix + ".level", Level.INFO));
+        setFormatter(getFormatterProperty(propsPrefix + ".formatter", new SimpleFormatter()));
+        setRegion(getStringProperty(propsPrefix + ".region", ""));
 
-        String hostProperty = getStringProperty(cname + ".host", null);
+        String hostProperty = getStringProperty(propsPrefix + ".host", null);
         if (isNullOrEmpty(hostProperty)) {
             setHost(String.format(DATA_ENDPOINT_TEMPLATE, region));
         } else {
             setHost(hostProperty);
         }
 
-        setPort(getIntProperty(cname + ".port", 514));
-        setToken(getBytesProperty(cname + ".token", ""));
+        setPort(getIntProperty(propsPrefix + ".port", 514));
+        setToken(getBytesProperty(propsPrefix + ".token", ""));
     }
 
     void connect() {

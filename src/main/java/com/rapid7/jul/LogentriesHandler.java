@@ -1,112 +1,76 @@
 package com.rapid7.jul;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.text.MessageFormat;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
-import java.util.logging.SimpleFormatter;
+import com.rapid7.net.AsyncLogger;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.rapid7.Constants.DATA_ENDPOINT_TEMPLATE;
-import static java.util.logging.ErrorManager.CLOSE_FAILURE;
+import java.text.MessageFormat;
+import java.util.logging.*;
+
 import static java.util.logging.ErrorManager.FORMAT_FAILURE;
 import static java.util.logging.ErrorManager.GENERIC_FAILURE;
-import static java.util.logging.ErrorManager.OPEN_FAILURE;
-import static java.util.logging.ErrorManager.WRITE_FAILURE;
 
-/**
- * <code>LogentriesHandler</code>: A handler for writing formatted records to a
- * logentries.com. This handler uses the Token-based input.
- *
- * @author Björn Raupach (raupach@me.com)
- */
-public final class LogentriesHandler extends Handler {
+public class LogentriesHandler extends Handler {
 
-    private final byte[] newline = {0x0D, 0x0A};
-    private final byte space = 0x020;
-    private String host;
-    private int port;
-    private byte[] token;
-    private String region;
-    private boolean open;
-    private SocketChannel channel;
-    private ByteBuffer buffer;
+    /**
+     * Asynchronous Background logger
+     */
+    AsyncLogger iopsAsync;
 
     public LogentriesHandler() {
         this(null);
     }
 
     public LogentriesHandler(String prefix) {
+        iopsAsync = new AsyncLogger();
         configure(prefix);
-        connect();
-        buffer = ByteBuffer.allocate(4096);
     }
 
-    public String getHost() {
-        return host;
+    void configure(String prefix) {
+        String cname = getClass().getName();
+        String propsPrefix = prefix == null ? cname : prefix + "." + cname;
+        setLevel(getLevelProperty(propsPrefix + ".level", Level.INFO));
+        setFormatter(getFormatterProperty(propsPrefix + ".formatter", new SimpleFormatter()));
+        setRegion(getStringProperty(propsPrefix + ".region", ""));
+        setHost(getStringProperty(propsPrefix + ".host", null));
+        setPort(getIntProperty(propsPrefix + ".port", 0));
+        setToken(getStringProperty(propsPrefix + ".token", ""));
+        setUseDataHub(getBooleanProperty(propsPrefix + ".useDataHub", false));
+        setHttpPut(getBooleanProperty(propsPrefix + ".httpPut", false));
+        setSsl(getBooleanProperty(propsPrefix + ".ssl", true));
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    private void setUseDataHub(boolean useDataHub) {
+        iopsAsync.setUseDataHub(useDataHub);
     }
 
-    public int getPort() {
-        return port;
+    private void setRegion(String region) {
+        iopsAsync.setRegion(region);
     }
 
-    public void setPort(int port) {
-        this.port = port;
+
+    private void setHost(String host) {
+        iopsAsync.setDataHubAddr(host);
     }
 
-    public byte[] getToken() {
-        return token;
+    private void setPort(int port) {
+        iopsAsync.setDataHubPort(port);
     }
 
-    public void setToken(byte[] token) {
-        this.token = token;
+    private void setToken(String token) {
+        iopsAsync.setToken(token);
     }
 
-    public String getRegion() {
-        return region;
+    public void setSsl(boolean ssl) {
+        this.iopsAsync.setSsl(ssl);
     }
 
-    public void setRegion(String region) {
-        this.region = region;
+    public void setHttpPut(boolean httpPut) {
+        this.iopsAsync.setHttpPut(httpPut);
     }
-
 
     @Override
-    public synchronized void publish(LogRecord record) {
-        if (open && isLoggable(record)) {
-            String msg = formatMessage(record);
-            if (!msg.isEmpty()) {
-                boolean filled = fillAndFlip(msg);
-                if (filled) {
-                    boolean drained = drain();
-                    if (!drained) {
-                        System.err.println("java.util.logging.ErrorManager: Sending to logentries.com failed. Trying to reconnect once.");
-                        connect();
-                        if (open) {
-                            filled = fillAndFlip(msg);
-                            if (filled) {
-                                drained = drain();
-                                if (!drained) {
-                                    System.err.println("java.util.logging.ErrorManager: Unable to reconnect. Shutting handler down.");
-                                    close();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    public void publish(LogRecord record) {
+        if (isLoggable(record)) {
+            this.iopsAsync.addLineToQueue(formatMessage(record));
         }
     }
 
@@ -122,77 +86,14 @@ public final class LogentriesHandler extends Handler {
         return msg;
     }
 
-    boolean fillAndFlip(String formattedMessage) {
-        try {
-            buffer.clear();
-            buffer.put(token);
-            buffer.put(space);
-            buffer.put(formattedMessage.getBytes(Charset.forName("UTF-8")));
-            buffer.put(newline);
-        } catch (BufferOverflowException e) {
-            reportError("Buffer exceeds capacity", e, WRITE_FAILURE);
-            return false;
-        }
-        buffer.flip();
-        return true;
-    }
-
-    boolean drain() {
-        while (buffer.hasRemaining()) {
-            try {
-                channel.write(buffer);
-            } catch (Exception e) {
-                reportError("Error while writing channel.", e, WRITE_FAILURE);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    void configure(String prefix) {
-        String cname = getClass().getName();
-        String propsPrefix = prefix == null ? cname : prefix + "." + cname;
-        setLevel(getLevelProperty(propsPrefix + ".level", Level.INFO));
-        setFormatter(getFormatterProperty(propsPrefix + ".formatter", new SimpleFormatter()));
-        setRegion(getStringProperty(propsPrefix + ".region", ""));
-
-        String hostProperty = getStringProperty(propsPrefix + ".host", null);
-        if (isNullOrEmpty(hostProperty)) {
-            setHost(String.format(DATA_ENDPOINT_TEMPLATE, region));
-        } else {
-            setHost(hostProperty);
-        }
-
-        setPort(getIntProperty(propsPrefix + ".port", 514));
-        setToken(getBytesProperty(propsPrefix + ".token", ""));
-    }
-
-    void connect() {
-        try {
-            channel = SocketChannel.open();
-            channel.connect(new InetSocketAddress(host, port));
-            open = true;
-        } catch (IOException e) {
-            open = false;
-            reportError(MessageFormat.format("Error connection to host: {0}:{1}", host, port), e, OPEN_FAILURE);
-        }
-    }
-
     @Override
     public void flush() {
+        // no need to flush since the log is sent by AsyncLogger
     }
 
     @Override
-    public void close() throws SecurityException {
-        open = false;
-        buffer = null;
-        if (channel != null) {
-            try {
-                channel.close();
-            } catch (IOException e) {
-                reportError("Error while closing channel.", e, CLOSE_FAILURE);
-            }
-        }
+    public void close() {
+        iopsAsync.close();
     }
 
     // -- These methods are private in LogManager
@@ -235,8 +136,19 @@ public final class LogentriesHandler extends Handler {
         return val.trim();
     }
 
-    byte[] getBytesProperty(String name, String defaultValue) {
-        return getStringProperty(name, defaultValue).getBytes();
+    boolean getBooleanProperty(String name, boolean defaultValue) {
+        LogManager manager = LogManager.getLogManager();
+        String val = manager.getProperty(name);
+        if (val == null) {
+            return defaultValue;
+        }
+        try {
+            return Boolean.parseBoolean(val.trim());
+        } catch (NumberFormatException e) {
+            reportError(MessageFormat.format("Error reading property ''{0}''", name), e, GENERIC_FAILURE);
+            return defaultValue;
+        }
+
     }
 
     int getIntProperty(String name, int defaultValue) {

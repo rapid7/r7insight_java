@@ -35,14 +35,6 @@
         <developerConnection>scm:git:git@github.com:rapid7/r7insight_java.git</developerConnection>
         <url>https://github.com/rapid7/r7insight_java</url>
     </scm>
-    <developers>
-        <developer>
-            <id>MarkLC</id>
-            <name>Mark Lacomber</name>
-            <email>marklacomber@gmail.com</email>
-        </developer>
-    </developers>
-
     <build>
         <plugins>
             <plugin>

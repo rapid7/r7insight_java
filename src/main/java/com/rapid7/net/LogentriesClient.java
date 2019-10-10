@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import static com.rapid7.Constants.HTTP_ENDPOINT_TEMPLATE;
 import static com.rapid7.Constants.DATA_ENDPOINT_TEMPLATE;
 
 /**
@@ -30,49 +29,46 @@ public class LogentriesClient {
     private static final int LE_SSL_PORT = 443;
 
     final SSLSocketFactory ssl_factory;
-    private boolean ssl_choice = false;
+    private boolean ssl_choice;
     private boolean http_choice = false;
     private Socket socket;
     private OutputStream stream;
-    private int dataHubPort = LE_PORT;
-    private boolean useDataHub = false;
+    private int port = LE_PORT;
     private String dataEndpoint;
-    private String httpEndpoint;
-    private String dataHubServer = dataEndpoint;
 
     public LogentriesClient(boolean httpPut, boolean ssl, boolean isUsingDataHub, String server, int port, String region) {
         if (isUsingDataHub) {
             ssl_factory = null; // DataHub does not support input over SSL for now,
             this.ssl_choice = false; // so SSL flag is ignored
-            useDataHub = true;
-            dataHubServer = server;
-            dataHubPort = port;
         } else {
             ssl_factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
             ssl_choice = ssl;
             http_choice = httpPut;
         }
-        dataEndpoint = String.format(DATA_ENDPOINT_TEMPLATE, region);
-        httpEndpoint = String.format(HTTP_ENDPOINT_TEMPLATE, region);
+        setPort(port, ssl);
+        setAddress(server, region);
     }
 
-    public int getPort() {
-        if (useDataHub) {
-            return dataHubPort;
-        } else if (ssl_choice) {
-            return LE_SSL_PORT;
+    private void setPort(int port, boolean ssl_choice){
+        if (port != 0) { //use the specified port if provided
+            this.port =  port;
+        } else {
+            this.port = ssl_choice ? LE_SSL_PORT : LE_PORT;
         }
+    }
 
-        return LE_PORT;
+    private void setAddress(String server, String region){
+        if (server == null || server.isEmpty()) {
+            this.dataEndpoint = String.format(DATA_ENDPOINT_TEMPLATE, region);
+        } else {
+            this.dataEndpoint = server;
+        }
+    }
+    public int getPort() {
+        return port;
     }
 
     public String getAddress() {
-        if (useDataHub) {
-            return dataHubServer;
-        } else if (http_choice) {
-            return httpEndpoint;
-        }
-
         return dataEndpoint;
     }
 

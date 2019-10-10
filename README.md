@@ -4,7 +4,7 @@
 Logging To InsightOps from Java
 ==============================
 
-Logentries currently supports logging from Java using the following logging libraries:
+InsightOps currently supports logging from Java using the following logging libraries:
 
 * [Log4J](https://insightops.help.rapid7.com/docs/log4j-log4j2)
 * [Log4J2](https://insightops.help.rapid7.com/docs/log4j-log4j2)

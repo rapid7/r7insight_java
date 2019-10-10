@@ -2,7 +2,6 @@ package com.rapid7.jul;
 
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.logging.LogManager;
@@ -13,26 +12,15 @@ import static junit.framework.TestCase.assertTrue;
 
 public class LogentriesHandlerTest {
 
-    private String trustStorePropertyValue;
-
-    private final String TRUST_STORE_PROPERTY_NAME = "javax.net.ssl.trustStore";
-
-    @Before
-    public void setUpSSLCertificate() {
-        trustStorePropertyValue = System.getProperty(TRUST_STORE_PROPERTY_NAME);
-        System.setProperty(TRUST_STORE_PROPERTY_NAME, getClass().getClassLoader().getResource("unit_test_key_store.jks").getPath());
-    }
-
     @After
     public void cleanUpConfiguration() {
-        if (trustStorePropertyValue == null) {
-            System.clearProperty(TRUST_STORE_PROPERTY_NAME);
-        } else {
-            System.setProperty(TRUST_STORE_PROPERTY_NAME, trustStorePropertyValue);
-        }
         LogManager.getLogManager().reset();
     }
 
+    /**
+     * This test needs the unit_test_key_store.jks certificate to be added to Trust Store, this is done in the pom.xml
+     * @throws Exception
+     */
     @Test
     public void singleLoggerDefaultTsl() throws Exception {
         final String message = "a message to log in tls";

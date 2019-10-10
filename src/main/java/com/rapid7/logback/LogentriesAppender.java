@@ -25,7 +25,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Asynchronous Background logger
      */
-    private final AsyncLogger le_async;
+    private final AsyncLogger iopsAsync;
     /**
      * Layout
      */
@@ -40,7 +40,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * Creates a new Logentries appender.
      */
     public LogentriesAppender() {
-        this.le_async = new AsyncLogger();
+        this.iopsAsync = new AsyncLogger();
     }
 
     /**
@@ -50,7 +50,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param logger the {@link AsyncLogger} to dispatch events
      */
     public LogentriesAppender(AsyncLogger logger) {
-        this.le_async = logger;
+        this.iopsAsync = logger;
     }
 
 	/*
@@ -63,7 +63,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param token
      */
     public void setToken(String token) {
-        this.le_async.setToken(token);
+        this.iopsAsync.setToken(token);
     }
 
     /**
@@ -72,7 +72,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param region
      */
     public void setRegion(String region) {
-        this.le_async.setRegion(region);
+        this.iopsAsync.setRegion(region);
     }
 
     /**
@@ -82,7 +82,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param HttpPut true to use HTTP PUT API
      */
     public void setHttpPut(boolean HttpPut) {
-        this.le_async.setHttpPut(HttpPut);
+        this.iopsAsync.setHttpPut(HttpPut);
     }
 
     /**
@@ -91,7 +91,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param account_key
      */
     public void setKey(String account_key) {
-        this.le_async.setKey(account_key);
+        this.iopsAsync.setKey(account_key);
     }
 
     /**
@@ -100,7 +100,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param log_location
      */
     public void setLocation(String log_location) {
-        this.le_async.setLocation(log_location);
+        this.iopsAsync.setLocation(log_location);
     }
 
     /**
@@ -109,7 +109,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param ssl
      */
     public void setSsl(boolean ssl) {
-        this.le_async.setSsl(ssl);
+        this.iopsAsync.setSsl(ssl);
     }
 
     /**
@@ -120,7 +120,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param debug debug flag to set
      */
     public void setDebug(boolean debug) {
-        this.le_async.setDebug(debug);
+        this.iopsAsync.setDebug(debug);
     }
 
     /**
@@ -129,7 +129,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param useDataHub set to true to send log messaged to a DataHub instance.
      */
     public void setIsUsingDataHub(boolean useDataHub) {
-        this.le_async.setUseDataHub(useDataHub);
+        this.iopsAsync.setUseDataHub(useDataHub);
     }
 
     /**
@@ -138,7 +138,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param dataHubAddr address like "127.0.0.1"
      */
     public void setDataHubAddr(String dataHubAddr) {
-        this.le_async.setDataHubAddr(dataHubAddr);
+        this.iopsAsync.setDataHubAddr(dataHubAddr);
     }
 
     /**
@@ -147,7 +147,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param dataHubPort
      */
     public void setDataHubPort(int dataHubPort) {
-        this.le_async.setDataHubPort(dataHubPort);
+        this.iopsAsync.setDataHubPort(dataHubPort);
     }
 
     /**
@@ -156,7 +156,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param logHostName
      */
     public void setLogHostName(boolean logHostName) {
-        this.le_async.setLogHostName(logHostName);
+        this.iopsAsync.setLogHostName(logHostName);
     }
 
     /**
@@ -165,7 +165,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param hostName
      */
     public void setHostName(String hostName) {
-        this.le_async.setHostName(hostName);
+        this.iopsAsync.setHostName(hostName);
     }
 
     /**
@@ -174,7 +174,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param logID
      */
     public void setLogID(String logID) {
-        this.le_async.setLogID(logID);
+        this.iopsAsync.setLogID(logID);
     }
 
     /**
@@ -244,7 +244,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
         // Render the event according to layout
         String formattedEvent = layout.doLayout(event);
         // Prepare to be queued
-        this.le_async.addLineToQueue(formattedEvent);
+        this.iopsAsync.addLineToQueue(formattedEvent);
     }
 
     /**
@@ -253,7 +253,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     @Override
     public void stop() {
         super.stop();
-        this.le_async.close();
+        this.iopsAsync.close();
     }
 
     public Layout<ILoggingEvent> buildLayout() {

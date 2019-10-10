@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
- * Logentries Asynchronous Logger for integration with Java logging frameworks.
+ * InsightOps Asynchronous Logger for integration with Java logging frameworks.
  * <p>
  * a RevelOps™ service
  * <p>
@@ -77,7 +77,7 @@ public class AsyncLogger {
     /**
      * Error message displayed when queue overflow occurs
      */
-    private static final String QUEUE_OVERFLOW = "\n\nLogentries Buffer Queue Overflow. Message Dropped!\n\n";
+    private static final String QUEUE_OVERFLOW = "\n\nInsightOps Buffer Queue Overflow. Message Dropped!\n\n";
     /**
      * Identifier for this client library
      */
@@ -502,7 +502,7 @@ public class AsyncLogger {
         // Check that we have all parameters set and socket appender running.
         // If DataHub mode is used then credentials check is ignored.
         if (!this.started && (useDataHub || this.checkCredentials())) {
-            dbg("Starting Logentries asynchronous socket appender");
+            dbg("Starting InsightOps asynchronous socket appender");
             appender.start();
             started = true;
         }
@@ -529,12 +529,12 @@ public class AsyncLogger {
     }
 
     /**
-     * Closes all connections to Logentries.
+     * Closes all connections to InsightOps.
      */
     public void close() {
         appender.interrupt();
         started = false;
-        dbg("Closing Logentries asynchronous socket appender");
+        dbg("Closing InsightOps asynchronous socket appender");
     }
 
     /**
@@ -563,37 +563,37 @@ public class AsyncLogger {
          */
         final Random random = new Random();
         /**
-         * Logentries Client for connecting to Logentries via HTTP or TCP.
+         * Logentries Client for connecting to InsightOPS via HTTP or TCP.
          */
-        LogentriesClient le_client;
+        LogentriesClient iopsClient;
 
         /**
          * Initializes the socket appender.
          */
         SocketAppender() {
-            super("Logentries Socket appender");
+            super("InsightOps Socket appender");
             // Don't block shut down
             setDaemon(true);
         }
 
         /**
-         * Opens connection to Logentries.
+         * Opens connection to InsightOps.
          *
          * @throws IOException
          */
         void openConnection() throws IOException {
             try {
-                if (this.le_client == null) {
-                    this.le_client = new LogentriesClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
+                if (this.iopsClient == null) {
+                    this.iopsClient = new LogentriesClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
                 }
 
-                this.le_client.connect();
+                this.iopsClient.connect();
 
                 if (httpPut) {
                     final String f = "PUT /%s/hosts/%s/?realtime=1 HTTP/1.1\r\n\r\n";
                     final String header = String.format(f, key, location);
                     byte[] temp = header.getBytes(ASCII);
-                    this.le_client.write(temp, 0, temp.length);
+                    this.iopsClient.write(temp, 0, temp.length);
                 }
 
             } catch (Exception e) {
@@ -602,7 +602,7 @@ public class AsyncLogger {
         }
 
         /**
-         * Tries to opens connection to Logentries until it succeeds.
+         * Tries to opens connection to InsightOps until it succeeds.
          *
          * @throws InterruptedException
          */
@@ -621,7 +621,7 @@ public class AsyncLogger {
                 } catch (IOException e) {
                     // Get information if in debug mode
                     if (debug) {
-                        dbg("Unable to connect to Logentries");
+                        dbg("Unable to connect to InsightOps");
                         e.printStackTrace();
                     }
                 }
@@ -641,8 +641,8 @@ public class AsyncLogger {
          */
         void closeConnection() {
 
-            if (this.le_client != null)
-                this.le_client.close();
+            if (this.iopsClient != null)
+                this.iopsClient.close();
 
         }
 
@@ -730,7 +730,7 @@ public class AsyncLogger {
                     // Send data, reconnect if needed
                     while (true) {
                         try {
-                            this.le_client.write(finalLine, 0, finalLine.length);
+                            this.iopsClient.write(finalLine, 0, finalLine.length);
                         } catch (IOException e) {
                             // Reopen the lost connection
                             reopenConnection();

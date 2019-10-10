@@ -21,12 +21,12 @@ public class LogentriesAppenderTest {
         le.setLocation(location);
         le.setKey(accountKey);
         le.setSsl(true);
-        assertEquals(le.le_async.getToken(), token);
-        assertEquals(le.le_async.getRegion(), region);
-        assertEquals(le.le_async.getHttpPut(), true);
-        assertEquals(le.le_async.getKey(), accountKey);
-        assertEquals(le.le_async.getLocation(), location);
-        assertEquals(le.le_async.getSsl(), true);
+        assertEquals(le.iopsAsync.getToken(), token);
+        assertEquals(le.iopsAsync.getRegion(), region);
+        assertEquals(le.iopsAsync.getHttpPut(), true);
+        assertEquals(le.iopsAsync.getKey(), accountKey);
+        assertEquals(le.iopsAsync.getLocation(), location);
+        assertEquals(le.iopsAsync.getSsl(), true);
     }
 
 }

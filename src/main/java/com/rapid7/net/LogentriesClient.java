@@ -9,10 +9,9 @@ import java.net.Socket;
 import static com.rapid7.Constants.DATA_ENDPOINT_TEMPLATE;
 
 /**
- * Client for sending messages to Logentries via HTTP PUT or Token-Based Logging
+ * Client for sending messages to InsightOPS via HTTP PUT or Token-Based Logging
  * Supports SSL/TLS
  *
- * @author Mark Lacomber
  */
 public class LogentriesClient {
     /*
@@ -22,18 +21,18 @@ public class LogentriesClient {
     /**
      * Port number for HTTP PUT/Token TCP logging on Logentries server.
      */
-    private static final int LE_PORT = 80;
+    private static final int IOPS_PORT = 80;
     /**
      * Port number for SSL HTTP PUT/TLS Token TCP logging on Logentries server.
      */
-    private static final int LE_SSL_PORT = 443;
+    private static final int IOPS_SSL_PORT = 443;
 
     final SSLSocketFactory ssl_factory;
     private boolean ssl_choice;
     private boolean http_choice = false;
     private Socket socket;
     private OutputStream stream;
-    private int port = LE_PORT;
+    private int port = IOPS_PORT;
     private String dataEndpoint;
 
     public LogentriesClient(boolean httpPut, boolean ssl, boolean isUsingDataHub, String server, int port, String region) {
@@ -53,7 +52,7 @@ public class LogentriesClient {
         if (port != 0) { //use the specified port if provided
             this.port =  port;
         } else {
-            this.port = ssl_choice ? LE_SSL_PORT : LE_PORT;
+            this.port = ssl_choice ? IOPS_SSL_PORT : IOPS_PORT;
         }
     }
 

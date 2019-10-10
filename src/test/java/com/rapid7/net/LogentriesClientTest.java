@@ -8,8 +8,8 @@ public class LogentriesClientTest {
 
     private static final String API_TOKEN_SERVER = "%s.data.logs.insight.rapid7.com";
     private static final String DATAHUB_IP = "127.0.0.1";
-    private static final int LE_SSL_PORT = 443;
-    private static final int LE_PORT = 80;
+    private static final int IOPS_SSL_PORT = 443;
+    private static final int IOPS_PORT = 80;
     private static final int DATAHUB_PORT = 10000;
     private static final boolean USE_HTTP_PUT = true;
     private static final boolean NOT_USE_HTTP_PUT = false;
@@ -57,16 +57,16 @@ public class LogentriesClientTest {
         assertEquals("Port 10000 should be used over 80", client2.getPort(), DATAHUB_PORT);
 
         LogentriesClient client3 = new LogentriesClient(USE_HTTP_PUT, USE_SSL, NOT_USE_DATAHUB, "", 0, "");
-        assertEquals("Port 443 should be used for SSL over HTTP", client3.getPort(), LE_SSL_PORT);
+        assertEquals("Port 443 should be used for SSL over HTTP", client3.getPort(), IOPS_SSL_PORT);
 
         LogentriesClient client4 = new LogentriesClient(USE_HTTP_PUT, NOT_USE_SSL, NOT_USE_DATAHUB, "", 0, "");
-        assertEquals("Port 80 should be used for HTTP PUT", client4.getPort(), LE_PORT);
+        assertEquals("Port 80 should be used for HTTP PUT", client4.getPort(), IOPS_PORT);
 
         LogentriesClient client5 = new LogentriesClient(NOT_USE_HTTP_PUT, USE_SSL, NOT_USE_DATAHUB, "", 0, "");
-        assertEquals("Port 443 should be used for SSL over Token TCP", client5.getPort(), LE_SSL_PORT);
+        assertEquals("Port 443 should be used for SSL over Token TCP", client5.getPort(), IOPS_SSL_PORT);
 
         LogentriesClient client6 = new LogentriesClient(NOT_USE_HTTP_PUT, NOT_USE_SSL, NOT_USE_DATAHUB, "", 0, "");
-        assertEquals("Port 80 should be used for Token TCP", client6.getPort(), LE_PORT);
+        assertEquals("Port 80 should be used for Token TCP", client6.getPort(), IOPS_PORT);
 
         LogentriesClient client7 = new LogentriesClient(NOT_USE_HTTP_PUT, NOT_USE_SSL, NOT_USE_DATAHUB, "", 10000, "");
         assertEquals("Port 10000 should be used because specified in the configuration", client7.getPort(), 10000);

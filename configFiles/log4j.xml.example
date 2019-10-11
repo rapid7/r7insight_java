@@ -2,11 +2,11 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration debug="true">
 	<appender name="le" class="com.rapid7.log4j.LogentriesAppender">
-		<!-- Enter your Logentries token, like bc0c4f90-a2d6-11e1-b3dd-0800200c9a66 -->
+		<!-- Enter your Logentries token, like 0c7407d4-fd0d-4436-bb50-44f1266b4490 -->
 		<param name="Token" value="LOGENTRIES_TOKEN" />
 		<param name="Region" value="eu" />
 		<param name="Debug" value="false" />
-		<param name="Ssl" value="false" />
+		<param name="Ssl" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern"
 				value="%d{yyyy-MM-dd HH:mm:ss ZZZ} %-5p (%F:%L)  %m" />

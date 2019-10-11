@@ -73,6 +73,7 @@
                 <version>2.19.1</version>
                 <configuration>
                     <systemPropertyVariables>
+                        <!--to Test tls/ssl mode connections in unit tests-->
                         <javax.net.ssl.trustStore>target/test-classes/unit_test_key_store.jks</javax.net.ssl.trustStore>
                     </systemPropertyVariables>
                     <!-- Travis build workaround -->

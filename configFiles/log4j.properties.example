@@ -5,4 +5,4 @@ log4j.appender.le.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss ZZZ} %-5p: %F:
 log4j.appender.le.Token=LOGENTRIES_TOKEN
 log4j.appender.le.Region=eu
 log4j.appender.le.Debug=False
-log4j.appender.le.Ssl=False
+log4j.appender.le.Ssl=true

@@ -6,7 +6,7 @@
 		<Token>LOGENTRIES_TOKEN</Token>
 		<Region>eu</Region>
 		<Debug>False</Debug>
-		<Ssl>False</Ssl>
+		<Ssl>true</Ssl>
 		<facility>USER</facility>
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>

@@ -9,6 +9,7 @@
             <debug>false</debug>
             <ignoreExceptions>false</ignoreExceptions>
             <logId></logId>
+            <ssl>true</ssl>
             <!-- datahub specific options -->
             <key>account_key</key>
             <useDataHub>false</useDataHub>

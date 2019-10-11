@@ -3,7 +3,12 @@ package com.rapid7.jul;
 import com.rapid7.net.AsyncLogger;
 
 import java.text.MessageFormat;
-import java.util.logging.*;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 import static java.util.logging.ErrorManager.FORMAT_FAILURE;
 import static java.util.logging.ErrorManager.GENERIC_FAILURE;
@@ -13,7 +18,7 @@ public class LogentriesHandler extends Handler {
     /**
      * Asynchronous Background logger
      */
-    AsyncLogger iopsAsync;
+    final AsyncLogger iopsAsync;
 
     public LogentriesHandler() {
         this(null);
@@ -68,7 +73,7 @@ public class LogentriesHandler extends Handler {
     }
 
     @Override
-    public void publish(LogRecord record) {
+    public synchronized void publish(LogRecord record) {
         if (isLoggable(record)) {
             this.iopsAsync.addLineToQueue(formatMessage(record));
         }
@@ -142,13 +147,14 @@ public class LogentriesHandler extends Handler {
         if (val == null) {
             return defaultValue;
         }
-        try {
-            return Boolean.parseBoolean(val.trim());
-        } catch (NumberFormatException e) {
-            reportError(MessageFormat.format("Error reading property ''{0}''", name), e, GENERIC_FAILURE);
+        if ("false".equalsIgnoreCase(val.trim())) {
+            return false;
+        } else if ("true".equalsIgnoreCase(val.trim())) {
+            return true;
+        } else {
+            reportError(MessageFormat.format("Error reading property ''{0}''", name), null, GENERIC_FAILURE);
             return defaultValue;
         }
-
     }
 
     int getIntProperty(String name, int defaultValue) {

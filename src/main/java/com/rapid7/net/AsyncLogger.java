@@ -14,7 +14,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 /**
  * InsightOps Asynchronous Logger for integration with Java logging frameworks.
  * <p>
- * a RevelOps™ service
+ * a Rapid7™ service
  * <p>
  * <p>
  * VERSION: 1.2.0
@@ -565,7 +565,7 @@ public class AsyncLogger {
         /**
          * Logentries Client for connecting to InsightOPS via HTTP or TCP.
          */
-        LogentriesClient iopsClient;
+        InsightOpsClient iopsClient;
 
         /**
          * Initializes the socket appender.
@@ -584,7 +584,7 @@ public class AsyncLogger {
         void openConnection() throws IOException {
             try {
                 if (this.iopsClient == null) {
-                    this.iopsClient = new LogentriesClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
+                    this.iopsClient = new InsightOpsClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
                 }
 
                 this.iopsClient.connect();

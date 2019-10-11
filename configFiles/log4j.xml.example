@@ -2,7 +2,7 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration debug="true">
 	<appender name="le" class="com.rapid7.log4j.LogentriesAppender">
-		<!-- Enter your Logentries token, like 0c7407d4-fd0d-4436-bb50-44f1266b4490 -->
+		<!-- Enter your log token, like 0c7407d4-fd0d-4436-bb50-44f1266b4490 -->
 		<param name="Token" value="LOGENTRIES_TOKEN" />
 		<param name="Region" value="eu" />
 		<param name="Debug" value="false" />

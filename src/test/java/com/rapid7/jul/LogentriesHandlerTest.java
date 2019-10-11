@@ -22,7 +22,7 @@ public class LogentriesHandlerTest {
      * @throws Exception
      */
     @Test
-    public void singleLoggerDefaultTsl() throws Exception {
+    public void singleLoggerDefaultTls() throws Exception {
         final String message = "a message to log in tls";
         final String token = "0c7407d4-fd0d-4436-bb50-44f1266b4490";
         SocketChannelReceiver receiver = null;
@@ -40,7 +40,7 @@ public class LogentriesHandlerTest {
     }
 
     @Test
-    public void singleLoggerNoTsl() throws Exception {
+    public void singleLoggerNoTls() throws Exception {
         final String message = "a message to log";
         final String token = "0c7407d4-fd0d-4436-bb50-44f1266b4490";
         SocketChannelReceiver receiver = null;

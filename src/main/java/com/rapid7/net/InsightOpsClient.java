@@ -1,5 +1,7 @@
 package com.rapid7.net;
 
+import com.google.common.base.Strings;
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
@@ -13,7 +15,7 @@ import static com.rapid7.Constants.DATA_ENDPOINT_TEMPLATE;
  * Supports SSL/TLS
  *
  */
-public class LogentriesClient {
+public class InsightOpsClient {
     /*
      * Constants
 	 */
@@ -32,10 +34,10 @@ public class LogentriesClient {
     private boolean http_choice = false;
     private Socket socket;
     private OutputStream stream;
-    private int port = IOPS_PORT;
+    private int port;
     private String dataEndpoint;
 
-    public LogentriesClient(boolean httpPut, boolean ssl, boolean isUsingDataHub, String server, int port, String region) {
+    public InsightOpsClient(boolean httpPut, boolean ssl, boolean isUsingDataHub, String server, int port, String region) {
         if (isUsingDataHub) {
             ssl_factory = null; // DataHub does not support input over SSL for now,
             this.ssl_choice = false; // so SSL flag is ignored
@@ -49,7 +51,7 @@ public class LogentriesClient {
     }
 
     private void setPort(int port, boolean ssl_choice){
-        if (port != 0) { //use the specified port if provided
+        if (port > 0) { //use the specified port if provided
             this.port =  port;
         } else {
             this.port = ssl_choice ? IOPS_SSL_PORT : IOPS_PORT;
@@ -57,7 +59,7 @@ public class LogentriesClient {
     }
 
     private void setAddress(String server, String region){
-        if (server == null || server.isEmpty()) {
+        if (Strings.isNullOrEmpty(server)) {
             this.dataEndpoint = String.format(DATA_ENDPOINT_TEMPLATE, region);
         } else {
             this.dataEndpoint = server;

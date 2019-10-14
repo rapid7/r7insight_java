@@ -13,24 +13,42 @@ public class AsyncLoggerTest {
     private static final String VALID_UUID = "a7ac14c3-2cc9-4f09-8fb3-73c5523e065c";
 
     @Test
-    public void testGetAndSetToken() {
-        AsyncLogger async = new AsyncLogger();
+    public void testConfigurationNoParams() {
+        AsyncLogger async = new AsyncLogger(new LoggerConfiguration.Builder().build());
         assertEquals("token should be empty string by default", async.getToken(), "");
-        async.setToken("randomToken");
-        assertEquals("getToken should return correct token", async.getToken(), "randomToken");
+        assertEquals("region should be empty string by default", async.getRegion(), null);
+        assertFalse("httpput should be false by default", async.getHttpPut());
+        assertTrue("ssl should be false by default", async.getSsl());
+        assertEquals("key should be empty string by default", async.getKey(), null);
+        assertEquals("locaton should be empty string by default", async.getLocation(), "");
+        assertEquals("log prefix should be empty string by default", async.getLogMessagePrefix(), "");
+        assertFalse("do not use datahub as default", async.getUseDataHub());
+        assertEquals("hostname should be empty", async.getHostName(), null);
     }
 
     @Test
-    public void testGetAndSetRegion() {
-        AsyncLogger async = new AsyncLogger();
-        assertEquals("region should be empty string by default", async.getRegion(), null);
-        async.setRegion("someRegion");
-        assertEquals("getRegion should return correct region", async.getRegion(), "someRegion");
+    public void testLogPrefix() {
+        AsyncLogger async = new AsyncLogger(
+                new LoggerConfiguration.Builder()
+                        .logHostNameAsPrefix(true)
+                        .setLogIdPrefix("LogId")
+                        .useAsHostName("localhost")
+                        .build());
+        assertEquals("log prefix should be set", async.getLogMessagePrefix(), "LogId HostName=localhost ");
+    }
+
+    @Test
+    public void testLogPrefixLogIdandHostNoSpecified() {
+        AsyncLogger async = new AsyncLogger(
+                new LoggerConfiguration.Builder()
+                        .logHostNameAsPrefix(true)
+                        .build());
+        assertTrue("log prefix should be set", async.getLogMessagePrefix().contains("HostName="));
     }
 
     @Test
     public void testOversizeMessage() {
-        AsyncLogger async = new AsyncLogger();
+        AsyncLogger async = new AsyncLogger(new LoggerConfiguration.Builder().build());
         char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
         StringBuilder sb = new StringBuilder();
         Random random = new Random();
@@ -42,101 +60,76 @@ public class AsyncLoggerTest {
         async.addLineToQueue(output);
     }
 
-    @Test
-    public void testGetAndSetHttpPut() {
-        AsyncLogger async = new AsyncLogger();
-        assertFalse("httpput should be false by default", async.getHttpPut());
-        async.setHttpPut(true);
-        assertTrue("getHttpPut should have returned true", async.getHttpPut());
-    }
-
-    @Test
-    public void testGetAndSetSsl() {
-        AsyncLogger async = new AsyncLogger();
-        assertFalse("ssl should be false by default", async.getSsl());
-        async.setSsl(true);
-        assertTrue("getSsl should have returned true", async.getSsl());
-    }
-
-    @Test
-    public void testGetAndSetKey() {
-        AsyncLogger async = new AsyncLogger();
-        assertEquals("key should be empty string by default", async.getToken(), "");
-        async.setToken("randomKey");
-        assertEquals("getKey should return correct key", async.getToken(), "randomKey");
-    }
-
-    @Test
-    public void testGetAndSetLocation() {
-        AsyncLogger async = new AsyncLogger();
-        assertEquals("locaton should be empty string by default", async.getToken(), "");
-        async.setToken("randomLocation");
-        assertEquals("getLocation should return correct location", async.getToken(), "randomLocation");
-    }
 
     @Test
     public void testCheckCredentialsMissingToken() {
-        AsyncLogger async = new AsyncLogger();
-        assertFalse("checkCredentials should return false for empty token string", async.checkCredentials());
-        async.setToken("LOGENTRIES_TOKEN");
+        AsyncLogger async = new AsyncLogger(
+                new LoggerConfiguration.Builder()
+                        .useToken("LOGENTRIES_TOKEN")
+                        .build());
         assertFalse("checkCredentials should return false for default token string", async.checkCredentials());
     }
 
     @Test
     public void testCheckCredentialsMissingRegion() {
-        AsyncLogger async = new AsyncLogger();
-        async.setToken(VALID_UUID);
+        AsyncLogger async = new AsyncLogger(
+                new LoggerConfiguration.Builder()
+                        .useToken(VALID_UUID)
+                        .build());
         assertFalse("checkCredentials should return false for null region", async.checkCredentials());
-        async.setRegion("");
-        assertFalse("checkCredentials should return false for empty region", async.checkCredentials());
-        async.setRegion("someRegion");
-        assertTrue("checkCredentials should return true for a non-empty region string", async.checkCredentials());
     }
 
     @Test
     public void testCheckCredentialsValidToken() {
-        AsyncLogger async = new AsyncLogger();
-        async.setToken("not-a-uuid");
-        async.setRegion("someRegion");
-        assertFalse("checkCredentials should return false for invalid token", async.checkCredentials());
-        async.setToken(VALID_UUID);
+        AsyncLogger async = new AsyncLogger(
+                new LoggerConfiguration.Builder()
+                        .useToken(VALID_UUID)
+                        .inRegion("eu")
+                        .build());
         assertTrue("checkCredentials should return true for valid token", async.checkCredentials());
     }
 
     @Test
     public void testCheckCredentialsMissingKey() {
-        AsyncLogger async = new AsyncLogger();
-        async.setHttpPut(true);
-        async.setLocation("anywhere");
+        AsyncLogger async = new AsyncLogger(
+                new LoggerConfiguration.Builder()
+                        .useHttpPut(true)
+                        .httpPutLocation("location")
+                        .build());
         assertFalse("checkCredentials should return false for missing key", async.checkCredentials());
     }
 
     @Test
-    public void testCheckCredentialsValidKey() {
-        AsyncLogger async = new AsyncLogger();
-        async.setHttpPut(true);
-        async.setRegion("someRegion");
-        async.setKey("not-a-uuid");
-        async.setLocation("anywhere");
+    public void testCheckCredentialsInvalidKey() {
+        AsyncLogger async = new AsyncLogger(
+                new LoggerConfiguration.Builder()
+                        .useHttpPut(true)
+                        .inRegion("someRegion")
+                        .withHttpPutKey("not-a-uuid")
+                        .httpPutLocation("anywhere")
+                        .build());
         assertFalse("checkCredentials should return false for invalid key", async.checkCredentials());
-        async.setKey(VALID_UUID);
-        assertTrue("checkCredenetials should return true for valid key and location", async.checkCredentials());
     }
 
     @Test
-    public void testCheckCredentialsValidLocation() {
-        AsyncLogger async = new AsyncLogger();
-        async.setHttpPut(true);
-        async.setRegion("someRegion");
-        async.setKey(VALID_UUID);
-        assertFalse("checkCredentials should return false for empty location", async.checkCredentials());
-        async.setLocation("anywhere");
-        assertTrue("checkCredentials should return true for valid location", async.checkCredentials());
+    public void testCheckCredentialsValidKey() {
+        AsyncLogger async = new AsyncLogger(
+                new LoggerConfiguration.Builder()
+                        .useHttpPut(true)
+                        .inRegion("someRegion")
+                        .withHttpPutKey(VALID_UUID)
+                        .httpPutLocation("anywhere")
+                        .build());
+        assertTrue("checkCredentials should return true for valid key", async.checkCredentials());
     }
+
 
     @Test
     public void testCheckValidUUID() {
-        AsyncLogger async = new AsyncLogger();
+        AsyncLogger async = new AsyncLogger(
+                new LoggerConfiguration.Builder()
+                        .useToken("LOGENTRIES_TOKEN")
+                        .build());
         assertFalse("checkValidUUID should return false for an empty string", async.checkValidUUID(""));
         assertFalse("checkValidUUID should return false for invalid uuid", async.checkValidUUID("not-a-uuid"));
         assertTrue("checkValidUUID should return true for valid uuid", async.checkValidUUID(VALID_UUID));

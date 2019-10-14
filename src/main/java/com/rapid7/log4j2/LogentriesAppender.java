@@ -1,5 +1,6 @@
 package com.rapid7.log4j2;
 
+import com.rapid7.net.LoggerConfiguration;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -35,7 +36,7 @@ public final class LogentriesAppender extends AbstractAppender {
                                                     @PluginAttribute("key") String key,
                                                     @PluginAttribute("location") String location,
                                                     @PluginAttribute("httpPut") boolean httpPut,
-                                                    @PluginAttribute("ssl") boolean ssl,
+                                                    @PluginAttribute("useSsl") boolean ssl,
                                                     @PluginAttribute("debug") boolean debug,
                                                     @PluginAttribute("useDataHub") boolean useDataHub,
                                                     @PluginAttribute("dataHubAddr") String dataHubAddr,
@@ -59,9 +60,21 @@ public final class LogentriesAppender extends AbstractAppender {
             LOGGER.error("No region provided for LogentriesAppender");
             return null;
         }
-        FactoryData data = new FactoryData(token, region, key, location,
-                httpPut, ssl, debug, useDataHub, dataHubAddr, dataHubPort,
-                logHostName, hostName, logID);
+        LoggerConfiguration data = new LoggerConfiguration.Builder()
+                .inRegion(region)
+                .toServerAddress(dataHubAddr)
+                .toServerPort(dataHubPort)
+                .useToken(token)
+                .useDataHub(useDataHub)
+                .useHttpPut(httpPut)
+                .withHttpPutKey(key)
+                .httpPutLocation(location)
+                .runInDebugMode(debug)
+                .logHostNameAsPrefix(logHostName)
+                .useAsHostName(hostName)
+                .setLogIdPrefix(logID)
+                .useSSL(ssl)
+                .build();
         LogentriesManager manager = LogentriesManager.getManager(name, data);
         if (manager == null)
             return null;

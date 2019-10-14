@@ -1,6 +1,7 @@
 package com.rapid7.jul;
 
 import com.rapid7.net.AsyncLogger;
+import com.rapid7.net.LoggerConfiguration;
 
 import java.text.MessageFormat;
 import java.util.logging.Formatter;
@@ -25,52 +26,31 @@ public class LogentriesHandler extends Handler {
     }
 
     public LogentriesHandler(String prefix) {
-        iopsAsync = new AsyncLogger();
-        configure(prefix);
+        iopsAsync = new AsyncLogger(loadConfiguration(prefix));
     }
 
-    void configure(String prefix) {
+    private LoggerConfiguration loadConfiguration(String prefix) {
         String cname = getClass().getName();
         String propsPrefix = prefix == null ? cname : prefix + "." + cname;
         setLevel(getLevelProperty(propsPrefix + ".level", Level.INFO));
         setFormatter(getFormatterProperty(propsPrefix + ".formatter", new SimpleFormatter()));
-        setRegion(getStringProperty(propsPrefix + ".region", ""));
-        setHost(getStringProperty(propsPrefix + ".host", null));
-        setPort(getIntProperty(propsPrefix + ".port", 0));
-        setToken(getStringProperty(propsPrefix + ".token", ""));
-        setUseDataHub(getBooleanProperty(propsPrefix + ".useDataHub", false));
-        setHttpPut(getBooleanProperty(propsPrefix + ".httpPut", false));
-        setSsl(getBooleanProperty(propsPrefix + ".ssl", true));
+        return new LoggerConfiguration.Builder()
+                .inRegion(getStringProperty(propsPrefix + ".region", ""))
+                .toServerAddress(getStringProperty(propsPrefix + ".host", null))
+                .toServerPort(getIntProperty(propsPrefix + ".port", 0))
+                .useToken(getStringProperty(propsPrefix + ".token", ""))
+                .useDataHub(getBooleanProperty(propsPrefix + ".useDataHub", false))
+                .useHttpPut(getBooleanProperty(propsPrefix + ".httpPut", false))
+                .withHttpPutKey(getStringProperty(propsPrefix + ".key", ""))
+                .httpPutLocation(getStringProperty(propsPrefix + ".location", ""))
+                .runInDebugMode(getBooleanProperty(propsPrefix + ".debug", false))
+                .logHostNameAsPrefix(getBooleanProperty(propsPrefix + ".logHostName", false))
+                .useAsHostName(getStringProperty(propsPrefix + ".hostNameToLog", ""))
+                .setLogIdPrefix(getStringProperty(propsPrefix + ".logId", ""))
+                .useSSL(getBooleanProperty(propsPrefix + ".ssl", true))
+                .build();
     }
 
-    private void setUseDataHub(boolean useDataHub) {
-        iopsAsync.setUseDataHub(useDataHub);
-    }
-
-    private void setRegion(String region) {
-        iopsAsync.setRegion(region);
-    }
-
-
-    private void setHost(String host) {
-        iopsAsync.setDataHubAddr(host);
-    }
-
-    private void setPort(int port) {
-        iopsAsync.setDataHubPort(port);
-    }
-
-    private void setToken(String token) {
-        iopsAsync.setToken(token);
-    }
-
-    public void setSsl(boolean ssl) {
-        this.iopsAsync.setSsl(ssl);
-    }
-
-    public void setHttpPut(boolean httpPut) {
-        this.iopsAsync.setHttpPut(httpPut);
-    }
 
     @Override
     public synchronized void publish(LogRecord record) {

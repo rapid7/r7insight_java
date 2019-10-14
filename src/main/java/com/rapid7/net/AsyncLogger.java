@@ -1,5 +1,7 @@
 package com.rapid7.net;
 
+import com.google.common.base.Strings;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -23,11 +25,11 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * @author Mark Lacomber
  */
 
-public class AsyncLogger {
+public final class AsyncLogger {
 
-	/*
+    /*
      * Constants
-	 */
+     */
 
     /**
      * Limit on individual log length ie. 2^16
@@ -58,9 +60,9 @@ public class AsyncLogger {
      */
     private static final int MAX_DELAY = 10000;
     /**
-     * LE appender signature - used for debugging messages.
+     * IOPS appender signature - used for debugging messages.
      */
-    private static final String LE = "LE ";
+    private static final String IOPS = "IOPS ";
     /**
      * Platform dependent line separator to check for. Supported in Java 1.6+
      */
@@ -88,106 +90,142 @@ public class AsyncLogger {
      */
     private static final Pattern HOSTNAME_REGEX = Pattern.compile("[$/\\\"&+,:;=?#|<>_* \\[\\]]");
 
-	/*
-	 * Fields
-	 */
+    /*
+     * Fields
+     */
 
     /**
      * Destination Token.
      */
-    String token = "";
+    private final String token;
 
     /**
      * Region.
      */
-    String region;
+    private final String region;
     /**
      * Account Key.
      */
-    String key = "";
+    private final String key;
     /**
      * Account Log Location.
      */
-    String location = "";
+    private final String location;
     /**
      * HttpPut flag.
      */
-    boolean httpPut = false;
+    private final boolean httpPut;
     /**
      * SSL/TLS flag.
      */
-    boolean ssl = false;
+    private final boolean ssl;
     /**
      * Debug flag.
      */
-    boolean debug = false;
-    /**
-     * Make local connection only.
-     */
-    boolean local = false;
+    private final boolean debug;
+
     /**
      * UseDataHub flag.
      */
-    boolean useDataHub = false;
+    private final boolean useDataHub;
     /**
      * DataHubAddr - address of the server where DataHub instance resides.
      */
-    String dataHubAddr = null;
+    private final String dataHubAddr;
     /**
      * DataHubPort - port on which DataHub instance waits for messages
      */
-    int dataHubPort;
+    private final int dataHubPort;
     /**
      * LogHostName - switch that determines whether HostName should be appended to the log message
      */
-    boolean logHostName = false;
+    private final boolean logHostName;
     /**
      * HostName - value, that should be appended to the log message if logHostName is set to true
      */
-    String hostName = "";
+    private final String hostName;
     /**
      * LogID - user-defined ID string that is appended to the log message if non-empty
      */
-    String logID = "";
+    private final String logID;
 
     /**
      * Indicator if the socket appender has been started.
      */
-    boolean started = false;
+    private boolean started = false;
 
     /**
      * Asynchronous socket appender.
      */
-    SocketAppender appender;
+    private final SocketAppender appender;
     /**
      * Message queue.
      */
-    ArrayBlockingQueue<String> queue;
+    private final ArrayBlockingQueue<String> queue;
 
-	/*
-	 * Public methods for parameters
-	 */
+    private final String logMessagePrefix;
+
 
     /**
      * Initializes asynchronous logging.
-     *
-     * @param local make local connection to API server for testing
      */
-    AsyncLogger(boolean local) {
-        this.local = local;
+    public AsyncLogger(LoggerConfiguration configuration) {
 
         queue = new ArrayBlockingQueue<String>(QUEUE_SIZE);
         // Fill the queue with an identifier message for first entry sent to server
         queue.offer(LIBRARY_ID);
 
+        this.region = configuration.getRegion();
+        this.token = calculateToken(configuration);
+        this.key = configuration.getKey();
+        this.location = configuration.getLocation();
+        this.httpPut = configuration.isHttpPut();
+        this.ssl = configuration.isSsl();
+        this.debug = configuration.isDebug();
+        this.useDataHub = configuration.isUseDataHub();
+        this.dataHubAddr = configuration.getDataHubAddr();
+        this.dataHubPort = configuration.getDataHubPort();
+        this.logHostName = configuration.isLogHostName();
+        this.hostName = calculateHostName(configuration);
+        this.logID = configuration.getLogID();
+
+        this.logMessagePrefix = buildPrefixMessage();
         appender = new SocketAppender();
     }
 
-    /**
-     * Initializes asynchronous logging.
-     */
-    public AsyncLogger() {
-        this(false);
+    private String calculateToken(LoggerConfiguration configuration) {
+        if (!configuration.isHttpPut()
+                && (Strings.isNullOrEmpty(configuration.getToken()) || configuration.getToken().equals(CONFIG_TOKEN))) {
+            //Check if set in an environment variable, used with PaaS providers
+            String envToken = getEnvVar(CONFIG_TOKEN);
+            if (envToken.equals("")) {
+                dbg(INVALID_TOKEN);
+            }
+            return envToken;
+        }
+        return configuration.getToken();
+    }
+
+    private String calculateHostName(LoggerConfiguration configuration) {
+        if (configuration.isLogHostName()) {
+            if (Strings.isNullOrEmpty(configuration.getHostName())) {
+                dbg("Host name is not defined by user - trying to obtain it from the environment.");
+                try {
+                    return InetAddress.getLocalHost().getHostName();
+                } catch (UnknownHostException e) {
+                    // We cannot resolve local host name - so won't use it at all.
+                    dbg("Failed to get host name automatically; Host name will not be used in prefix.");
+                }
+            } else {
+                if (!checkIfHostNameValid(configuration.getHostName())) {
+                    // User-defined HostName is invalid - e.g. with prohibited characters,
+                    // so we'll not use it.
+                    dbg("There are some prohibited characters found in the host name defined in the config; Host name will not be used in prefix.");
+                    return null;
+                }
+            }
+        }
+        return configuration.getHostName();
     }
 
     /**
@@ -199,22 +237,12 @@ public class AsyncLogger {
         return token;
     }
 
-    /**
-     * Sets the token
-     *
-     * @param token
-     */
-    public void setToken(String token) {
-        this.token = token;
-        dbg("Setting token to " + token);
+    String getLogMessagePrefix() {
+        return logMessagePrefix;
     }
 
     public String getRegion() {
         return region;
-    }
-
-    public void setRegion(String region) {
-        this.region = region;
     }
 
     /**
@@ -226,14 +254,6 @@ public class AsyncLogger {
         return this.httpPut;
     }
 
-    /**
-     * Sets the HTTP PUT boolean flag. Send logs via HTTP PUT instead of default Token TCP
-     *
-     * @param HttpPut HttpPut flag to set
-     */
-    public void setHttpPut(boolean HttpPut) {
-        this.httpPut = HttpPut;
-    }
 
     /**
      * Gets the ACCOUNT KEY value for HTTP PUT
@@ -242,15 +262,6 @@ public class AsyncLogger {
      */
     public String getKey() {
         return this.key;
-    }
-
-    /**
-     * Sets the ACCOUNT KEY value for HTTP PUT
-     *
-     * @param account_key
-     */
-    public void setKey(String account_key) {
-        this.key = account_key;
     }
 
     /**
@@ -263,15 +274,6 @@ public class AsyncLogger {
     }
 
     /**
-     * Gets the LOCATION value for HTTP PUT
-     *
-     * @param log_location
-     */
-    public void setLocation(String log_location) {
-        this.location = log_location;
-    }
-
-    /**
      * Gets the SSL boolean flag
      *
      * @return ssl
@@ -280,14 +282,6 @@ public class AsyncLogger {
         return this.ssl;
     }
 
-    /**
-     * Sets the SSL boolean flag
-     *
-     * @param ssl
-     */
-    public void setSsl(boolean ssl) {
-        this.ssl = ssl;
-    }
 
     /**
      * Returns current debug flag.
@@ -296,17 +290,6 @@ public class AsyncLogger {
      */
     public boolean getDebug() {
         return debug;
-    }
-
-    /**
-     * Sets the debug flag. Appender in debug mode will print error messages on
-     * error console.
-     *
-     * @param debug debug flag to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-        dbg("Setting debug to " + debug);
     }
 
     /**
@@ -319,30 +302,12 @@ public class AsyncLogger {
     }
 
     /**
-     * Sets useDataHub flag. If set to "true" then messages will be sent to a DataHub instance.
-     *
-     * @param isUsingDataHub
-     */
-    public void setUseDataHub(boolean isUsingDataHub) {
-        this.useDataHub = isUsingDataHub;
-    }
-
-    /**
      * Gets DataHub instance address.
      *
      * @return DataHub address represented as String
      */
     public String getDataHubAddr() {
         return this.dataHubAddr;
-    }
-
-    /**
-     * Sets DataHub instance address.
-     *
-     * @param dataHubAddr
-     */
-    public void setDataHubAddr(String dataHubAddr) {
-        this.dataHubAddr = dataHubAddr;
     }
 
     /**
@@ -355,30 +320,12 @@ public class AsyncLogger {
     }
 
     /**
-     * Sets port on which DataHub waits for log messages.
-     *
-     * @param dataHubPort
-     */
-    public void setDataHubPort(int dataHubPort) {
-        this.dataHubPort = dataHubPort;
-    }
-
-    /**
      * Gets value of the switch that determines whether to send HostName alongside with the log message
      *
      * @return logHostName switch value
      */
     public boolean getLogHostName() {
         return this.logHostName;
-    }
-
-    /**
-     * Sets value of the switch that determines whether to send HostName alongside with the log message
-     *
-     * @param logHostName
-     */
-    public void setLogHostName(boolean logHostName) {
-        this.logHostName = logHostName;
     }
 
     /**
@@ -390,14 +337,6 @@ public class AsyncLogger {
         return this.hostName;
     }
 
-    /**
-     * Sets the HostName from configuration
-     *
-     * @param hostName
-     */
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
 
     /**
      * Gets LogID parameter
@@ -408,14 +347,6 @@ public class AsyncLogger {
         return this.logID;
     }
 
-    /**
-     * Sets LogID parameter from config
-     *
-     * @param logID
-     */
-    public void setLogID(String logID) {
-        this.logID = logID;
-    }
 
     /**
      * Checks that the UUID is valid
@@ -423,13 +354,11 @@ public class AsyncLogger {
     boolean checkValidUUID(String uuid) {
         if ("".equals(uuid))
             return false;
-
         try {
-            UUID u = UUID.fromString(uuid);
+            UUID.fromString(uuid);
         } catch (IllegalArgumentException e) {
             return false;
         }
-
         return true;
     }
 
@@ -437,9 +366,8 @@ public class AsyncLogger {
      * Try and retrieve environment variable for given key, return empty string if not found
      */
 
-    String getEnvVar(String key) {
+    private String getEnvVar(String key) {
         String envVal = System.getenv(key);
-
         return envVal != null ? envVal : "";
     }
 
@@ -451,24 +379,27 @@ public class AsyncLogger {
             dbg(INVALID_REGION);
             return false;
         }
-
         if (!httpPut) {
-            if (token.equals(CONFIG_TOKEN) || token.equals("")) {
-                //Check if set in an environment variable, used with PaaS providers
-                String envToken = getEnvVar(CONFIG_TOKEN);
-                if (envToken.equals("")) {
-                    dbg(INVALID_TOKEN);
-                    return false;
-                }
-                this.setToken(envToken);
-            }
             return checkValidUUID(this.getToken());
         } else {
-            if (!checkValidUUID(this.getKey()) || this.getLocation().equals(""))
+            if (!checkValidUUID(this.getKey()) || isNullOrEmpty(location))
                 return false;
         }
-
         return true;
+    }
+
+    /**
+     * Builds the prefix message.
+     */
+    private String buildPrefixMessage() {
+        StringBuilder sb = new StringBuilder();
+        if (!Strings.isNullOrEmpty(logID)) {
+            sb.append(logID).append(" "); // Append LogID and separator between logID and the rest part of the message.
+        }
+        if (logHostName && !Strings.isNullOrEmpty(hostName)) {
+            sb.append("HostName=").append(hostName).append(" ");
+        }
+        return sb.toString();
     }
 
     /**
@@ -498,7 +429,7 @@ public class AsyncLogger {
             return;
         }
 
-        //// Check credentials only if logs are sent to LE directly.
+        //// Check credentials only if logs are sent to Insight OPS directly.
         // Check that we have all parameters set and socket appender running.
         // If DataHub mode is used then credentials check is ignored.
         if (!this.started && (useDataHub || this.checkCredentials())) {
@@ -545,12 +476,13 @@ public class AsyncLogger {
     void dbg(String msg) {
         if (debug) {
             if (!msg.endsWith(LINE_SEP)) {
-                System.err.println(LE + msg);
+                System.err.println(IOPS + msg);
             } else {
-                System.err.print(LE + msg);
+                System.err.print(IOPS + msg);
             }
         }
     }
+
 
     /**
      * Asynchronous over the socket appender.
@@ -586,7 +518,6 @@ public class AsyncLogger {
                 if (this.iopsClient == null) {
                     this.iopsClient = new InsightOpsClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
                 }
-
                 this.iopsClient.connect();
 
                 if (httpPut) {
@@ -640,41 +571,10 @@ public class AsyncLogger {
          * Closes the connection. Ignores errors.
          */
         void closeConnection() {
-
             if (this.iopsClient != null)
                 this.iopsClient.close();
-
         }
 
-        /**
-         * Builds the prefix message for the StringBuilder.
-         */
-        private void buildPrefixMessage(StringBuilder sb) {
-            if (!logID.isEmpty()) {
-                sb.append(logID).append(" "); // Append LogID and separator between logID and the rest part of the message.
-            }
-
-            if (logHostName) {
-                if (hostName.isEmpty()) {
-                    dbg("Host name is not defined by user - trying to obtain it from the environment.");
-                    try {
-                        hostName = InetAddress.getLocalHost().getHostName();
-                        sb.append("HostName=").append(hostName).append(" ");
-                    } catch (UnknownHostException e) {
-                        // We cannot resolve local host name - so won't use it at all.
-                        dbg("Failed to get host name automatically; Host name will not be used in prefix.");
-                    }
-                } else {
-                    if (!checkIfHostNameValid(hostName)) {
-                        // User-defined HostName is invalid - e.g. with prohibited characters,
-                        // so we'll not use it.
-                        dbg("There are some prohibited characters found in the host name defined in the config; Host name will not be used in prefix.");
-                    } else {
-                        sb.append("HostName=").append(hostName).append(" ");
-                    }
-                }
-            }
-        }
 
         /**
          * Initializes the connection and starts to log.
@@ -684,16 +584,6 @@ public class AsyncLogger {
             try {
                 // Open connection
                 reopenConnection();
-
-                String logMessagePrefix = "";
-                StringBuilder sb = new StringBuilder(logMessagePrefix);
-
-                buildPrefixMessage(sb);
-
-                boolean logPrefixEmpty;
-                if (!(logPrefixEmpty = sb.toString().isEmpty())) {
-                    logMessagePrefix = sb.toString();
-                }
 
                 // Use StringBuilder here because if use just overloaded
                 // + operator it may give much more work for allocator and GC.
@@ -717,7 +607,7 @@ public class AsyncLogger {
 
                     // If message prefix (LogID + HostName) is not empty
                     // then add it to the message.
-                    if (!logPrefixEmpty) {
+                    if (!Strings.isNullOrEmpty(logMessagePrefix)) {
                         finalDataBuilder.append(logMessagePrefix);
                     }
 

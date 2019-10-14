@@ -1,14 +1,14 @@
 package com.rapid7.jul;
 
 
+import com.rapid7.util.SocketChannelReceiver;
 import org.junit.After;
 import org.junit.Test;
 
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static com.rapid7.util.LogMessageValidator.validateLogMessage;
 
 public class LogentriesHandlerTest {
 
@@ -17,8 +17,11 @@ public class LogentriesHandlerTest {
         LogManager.getLogManager().reset();
     }
 
+    private static final String EMPTY_PREFIX = "";
+
     /**
      * This test needs the unit_test_key_store.jks certificate to be added to Trust Store, this is done in the pom.xml
+     *
      * @throws Exception
      */
     @Test
@@ -27,13 +30,13 @@ public class LogentriesHandlerTest {
         final String token = "0c7407d4-fd0d-4436-bb50-44f1266b4490";
         SocketChannelReceiver receiver = null;
         try {
-            receiver = SocketChannelReceiver.createAndStartReceiver(10000, true);
+            receiver = SocketChannelReceiver.createAndStartReceiver(20000, true);
             LogManager.getLogManager().readConfiguration(getClass()
                     .getClassLoader().getResourceAsStream("logging_single_handler_tls.properties"));
             Logger logger = Logger.getLogger("logger");
             logger.info(message);
             receiver.pollMessage();// skipping library init
-            validateLogMessage(token, message, receiver.pollMessage());
+            validateLogMessage(token, EMPTY_PREFIX, message, receiver.pollMessage());
         } finally {
             receiver.close();
         }
@@ -43,6 +46,7 @@ public class LogentriesHandlerTest {
     public void singleLoggerNoTls() throws Exception {
         final String message = "a message to log";
         final String token = "0c7407d4-fd0d-4436-bb50-44f1266b4490";
+        final String prefix = "aLogId HostName=localhost";
         SocketChannelReceiver receiver = null;
         try {
             receiver = SocketChannelReceiver.createAndStartReceiver(10000, false);
@@ -51,7 +55,7 @@ public class LogentriesHandlerTest {
             Logger logger = Logger.getLogger("logger");
             logger.info(message);
             receiver.pollMessage();// skipping library init
-            validateLogMessage(token, message, receiver.pollMessage());
+            validateLogMessage(token, prefix, message, receiver.pollMessage());
         } finally {
             receiver.close();
         }
@@ -74,21 +78,14 @@ public class LogentriesHandlerTest {
             Logger log2 = Logger.getLogger("logger2");
             log1.info(messageLogger1);
             receiverLogger1.pollMessage();// skipping library init
-            validateLogMessage(tokenLogger1, messageLogger1, receiverLogger1.pollMessage());
+            validateLogMessage(tokenLogger1, EMPTY_PREFIX, messageLogger1, receiverLogger1.pollMessage());
             log2.info(messageLogger2);
             receiverLogger2.pollMessage();// skipping library init
-            validateLogMessage(tokenLogger2, messageLogger2, receiverLogger2.pollMessage());
+            validateLogMessage(tokenLogger2, EMPTY_PREFIX, messageLogger2, receiverLogger2.pollMessage());
         } finally {
             receiverLogger1.close();
             receiverLogger2.close();
         }
-    }
-
-
-    private void validateLogMessage(String token, String message, String logLine) {
-        assertTrue("Log line length verification", logLine.length() > token.length() + message.length());
-        assertEquals("Token verification", token, logLine.substring(0, token.length()));
-        assertEquals("Log Message verification", message, logLine.substring(logLine.length() - message.length() - 1, logLine.length() - 1));
     }
 
 }

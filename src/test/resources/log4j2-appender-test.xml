@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="DEBUG" debug="true">
+<Configuration status="WARN">
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </Console>
-        <!--
-        <Logentries name="Logentries"
-                    token="${sys:logentries.token}"
-                    logID="foo-test-log"
-                    location="somewhere"
-                    logHostName="true"
-                    hostName="blah"
-                    debug="true">
-            <PatternLayout pattern="level=%level thread=%t logger=%logger throwable=%throwable{short} msg=%msg "/>
+        <Logentries >
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss ZZZ} %F.%L level:%-5p%m"/>
+            <name>le</name>
+            <token>0c7407d4-fd0d-4436-bb50-44f1266b4490</token>
+            <region>eu</region>
+            <debug>false</debug>
+            <ignoreExceptions>false</ignoreExceptions>
+            <logId>test</logId>
+            <useSsl>true</useSsl>
+            <!-- datahub specific options -->
+            <key>account_key_unit_test</key>
+            <useDataHub>false</useDataHub>
+            <dataHubAddr>localhost</dataHubAddr>
+            <location>my_datacentre</location>
+            <dataHubPort>20000</dataHubPort>
+            <logHostName>true</logHostName>
+            <hostName>my_host</hostName>
+            <httpPut>false</httpPut>
         </Logentries>
-        -->
-        <Logentries name="Logentries"
-                    token="${sys:logentries.token}"
-                    debug="true">
-            <JsonLayout compact="true"/>
-        </Logentries>
-
     </Appenders>
+
     <Loggers>
-        <Root level="INFO">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="Logentries"/>
+        <Root level="DEBUG">
+            <AppenderRef ref="le" />
         </Root>
-        <AsyncLogger name="test-async-logger" level="INFO">
-            <AppenderRef ref="Logentries"/>
-        </AsyncLogger>
     </Loggers>
 </Configuration>
+
+

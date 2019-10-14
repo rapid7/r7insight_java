@@ -1,4 +1,4 @@
-package com.rapid7.jul;
+package com.rapid7.util;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -24,6 +24,7 @@ public class SocketChannelReceiver {
     private final int port;
     private ServerSocket serverSocket;
     private boolean isReady = false;
+    private static final char[] SSL_CERTIFICATE_PASSWORD = "keypassword".toCharArray();
 
     private SocketChannelReceiver(int port) {
         this.port = port;
@@ -56,7 +57,9 @@ public class SocketChannelReceiver {
     }
 
     public String pollMessage() throws Exception {
-        return messagesReceived.poll(3, TimeUnit.SECONDS);
+        String message = messagesReceived.poll(3, TimeUnit.SECONDS);
+        //clean the message from spaces and end line
+        return message.replace("\u2028", "").trim();
     }
 
     public void close() {
@@ -87,7 +90,7 @@ public class SocketChannelReceiver {
         InputStream ksIs = getClass()
                 .getClassLoader().getResourceAsStream("unit_test_key_store.jks");
         try {
-            ks.load(ksIs, "keypassword".toCharArray());
+            ks.load(ksIs, SSL_CERTIFICATE_PASSWORD);
         } finally {
             if (ksIs != null) {
                 ksIs.close();
@@ -95,7 +98,7 @@ public class SocketChannelReceiver {
         }
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory
                 .getDefaultAlgorithm());
-        kmf.init(ks, "keypassword".toCharArray());
+        kmf.init(ks, SSL_CERTIFICATE_PASSWORD);
 
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(kmf.getKeyManagers(), null, null);

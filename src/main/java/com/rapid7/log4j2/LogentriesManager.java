@@ -1,6 +1,7 @@
 package com.rapid7.log4j2;
 
 import com.rapid7.net.AsyncLogger;
+import com.rapid7.net.LoggerConfiguration;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.AbstractManager;
 import org.apache.logging.log4j.core.appender.ManagerFactory;
@@ -15,33 +16,14 @@ public class LogentriesManager extends AbstractManager {
     private static LogentriesManagerFactory FACTORY = new LogentriesManagerFactory();
     private final AsyncLogger asyncLogger;
 
-    protected LogentriesManager(LoggerContext loggerContext, String name, FactoryData data) {
+    protected LogentriesManager(LoggerContext loggerContext, String name, LoggerConfiguration data) {
         super(loggerContext, name);
-        asyncLogger = new AsyncLogger();
-        asyncLogger.setToken(data.getToken());
-        asyncLogger.setRegion(data.getRegion());
-        asyncLogger.setKey(data.getKey());
-        asyncLogger.setLocation(nullToEmpty(data.getLocation()));
-        asyncLogger.setHttpPut(data.isHttpPut());
-        asyncLogger.setSsl(data.isSsl());
-        asyncLogger.setDebug(data.isDebug());
-        asyncLogger.setUseDataHub(data.isUseDataHub());
-        asyncLogger.setDataHubAddr(data.getDataHubAddr());
-        asyncLogger.setDataHubPort(data.getDataHubPort());
-        asyncLogger.setLogHostName(data.isLogHostName());
-        // AsyncLogger doesn't like it when hostName is null. [jsd]
-        asyncLogger.setHostName(nullToEmpty(data.getHostName()));
-        // AsyncLogger doesn't like it when logID is null. [jsd]
-        asyncLogger.setLogID(nullToEmpty(data.getLogID()));
+        asyncLogger = new AsyncLogger(data);
         LOGGER.debug("AsyncLogger created.");
     }
 
-    static LogentriesManager getManager(String name, FactoryData data) {
+    static LogentriesManager getManager(String name, LoggerConfiguration data) {
         return getManager(name, FACTORY, data);
-    }
-
-    private String nullToEmpty(String s) {
-        return s == null ? "" : s;
     }
 
     @Override
@@ -55,9 +37,9 @@ public class LogentriesManager extends AbstractManager {
         asyncLogger.addLineToQueue(line);
     }
 
-    static class LogentriesManagerFactory implements ManagerFactory<LogentriesManager, FactoryData> {
+    static class LogentriesManagerFactory implements ManagerFactory<LogentriesManager, LoggerConfiguration> {
         @Override
-        public LogentriesManager createManager(String name, FactoryData data) {
+        public LogentriesManager createManager(String name, LoggerConfiguration data) {
             return new LogentriesManager(new LoggerContext(name), name, data);
         }
     }

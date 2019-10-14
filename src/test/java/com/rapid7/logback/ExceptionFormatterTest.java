@@ -2,9 +2,10 @@ package com.rapid7.logback;
 
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
-import junit.framework.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import static junit.framework.TestCase.assertEquals;
 
 public class ExceptionFormatterTest {
 
@@ -22,7 +23,7 @@ public class ExceptionFormatterTest {
         Mockito.stub(error.getMessage()).toReturn("err!");
 
         String trace = ExceptionFormatter.formatException(error);
-        Assert.assertEquals(trace, "com.foo.SomeClass: err!" +
+        assertEquals(trace, "com.foo.SomeClass: err!" +
                 ExceptionFormatter.DELIMITER + ExceptionFormatter.TAB +
                 "trace level 1" + ExceptionFormatter.DELIMITER);
     }

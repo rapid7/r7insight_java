@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<properties>
-		<additionalparam>-Xdoclint:none</additionalparam>
+    <properties>
+        <additionalparam>-Xdoclint:none</additionalparam>
         <guava.version>21.0</guava.version>
         <jackson.version>2.4.2</jackson.version>
         <log4j.version>2.7</log4j.version>
@@ -35,6 +36,12 @@
         <developerConnection>scm:git:git@github.com:rapid7/r7insight_java.git</developerConnection>
         <url>https://github.com/rapid7/r7insight_java</url>
     </scm>
+    <developers>
+        <developer>
+            <name>Rapid7</name>
+            <email>InsightOpsTeam@rapid7.com</email>
+        </developer>
+    </developers>
     <build>
         <plugins>
             <plugin>
@@ -148,7 +155,7 @@
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
             <version>${disruptor.version}</version>
-           <optional>true</optional> 
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

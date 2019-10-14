@@ -138,7 +138,7 @@ public class LoggerConfiguration {
             return this;
         }
 
-        public Builder withHttpPutKey(String key) {
+        public Builder useAccountKey(String key) {
             this.key = key;
             return this;
         }

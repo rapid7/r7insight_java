@@ -105,7 +105,7 @@ public class AsyncLoggerTest {
                 new LoggerConfiguration.Builder()
                         .useHttpPut(true)
                         .inRegion("someRegion")
-                        .withHttpPutKey("not-a-uuid")
+                        .useAccountKey("not-a-uuid")
                         .httpPutLocation("anywhere")
                         .build());
         assertFalse("checkCredentials should return false for invalid key", async.checkCredentials());
@@ -117,7 +117,7 @@ public class AsyncLoggerTest {
                 new LoggerConfiguration.Builder()
                         .useHttpPut(true)
                         .inRegion("someRegion")
-                        .withHttpPutKey(VALID_UUID)
+                        .useAccountKey(VALID_UUID)
                         .httpPutLocation("anywhere")
                         .build());
         assertTrue("checkCredentials should return true for valid key", async.checkCredentials());

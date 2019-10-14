@@ -67,7 +67,7 @@ public final class LogentriesAppender extends AbstractAppender {
                 .useToken(token)
                 .useDataHub(useDataHub)
                 .useHttpPut(httpPut)
-                .withHttpPutKey(key)
+                .useAccountKey(key)
                 .httpPutLocation(location)
                 .runInDebugMode(debug)
                 .logHostNameAsPrefix(logHostName)

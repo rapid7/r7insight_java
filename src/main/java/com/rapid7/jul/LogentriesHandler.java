@@ -41,7 +41,7 @@ public class LogentriesHandler extends Handler {
                 .useToken(getStringProperty(propsPrefix + ".token", ""))
                 .useDataHub(getBooleanProperty(propsPrefix + ".useDataHub", false))
                 .useHttpPut(getBooleanProperty(propsPrefix + ".httpPut", false))
-                .withHttpPutKey(getStringProperty(propsPrefix + ".key", ""))
+                .useAccountKey(getStringProperty(propsPrefix + ".key", ""))
                 .httpPutLocation(getStringProperty(propsPrefix + ".location", ""))
                 .runInDebugMode(getBooleanProperty(propsPrefix + ".debug", false))
                 .logHostNameAsPrefix(getBooleanProperty(propsPrefix + ".logHostName", false))

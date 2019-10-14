@@ -63,7 +63,7 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param accountKey
      */
     public void setKey(String accountKey) {
-        this.configurationBuilder.withHttpPutKey(accountKey);
+        this.configurationBuilder.useAccountKey(accountKey);
     }
 
     /**

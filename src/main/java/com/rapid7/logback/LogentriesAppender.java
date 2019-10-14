@@ -85,7 +85,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param accountKey
      */
     public void setKey(String accountKey) {
-        this.configurationBuilder.withHttpPutKey(accountKey);
+        this.configurationBuilder.useAccountKey(accountKey);
     }
 
     /**

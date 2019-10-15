@@ -33,7 +33,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Sets the token
      *
-     * @param token
+     * @param token Insight OPS token
      */
     public void setToken(String token) {
         this.configurationBuilder.useToken(token);
@@ -42,7 +42,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Sets the region
      *
-     * @param region
+     * @param region region to send the log to (e.g. eu or us)
      */
     public void setRegion(String region) {
         this.configurationBuilder.inRegion(region);
@@ -60,7 +60,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Sets the ACCOUNT KEY value for HTTP PUT
      *
-     * @param accountKey
+     * @param accountKey account key value (for http put only)
      */
     public void setKey(String accountKey) {
         this.configurationBuilder.useAccountKey(accountKey);
@@ -69,7 +69,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Sets the LOCATION value for HTTP PUT
      *
-     * @param logLocation
+     * @param logLocation location on server (for http put only)
      */
     public void setLocation(String logLocation) {
         this.configurationBuilder.httpPutLocation(logLocation);
@@ -78,7 +78,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Sets the SSL boolean flag
      *
-     * @param ssl
+     * @param ssl true to send logs encrypted over ssl/tls
      */
     public void setSsl(boolean ssl) {
         this.configurationBuilder.useSSL(ssl);
@@ -115,7 +115,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Sets the port number on which DataHub instance waits for log messages.
      *
-     * @param dataHubPort
+     * @param dataHubPort data hub port number
      */
     public void setDataHubPort(int dataHubPort) {
         this.configurationBuilder.toServerPort(dataHubPort);
@@ -124,7 +124,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Determines whether to send HostName alongside with the log message
      *
-     * @param logHostName
+     * @param logHostName true to add server host name as log prefix
      */
     public void setLogHostName(boolean logHostName) {
         this.configurationBuilder.logHostNameAsPrefix(logHostName);
@@ -133,7 +133,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Sets the HostName from the configuration
      *
-     * @param hostName
+     * @param hostName host name value
      */
     public void setHostName(String hostName) {
         this.configurationBuilder.useAsHostName(hostName);
@@ -142,7 +142,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Sets LogID parameter from the configuration, it will appear as prefix in any log line
      *
-     * @param logID
+     * @param logID log prefix
      */
     public void setLogID(String logID) {
         this.configurationBuilder.setLogIdPrefix(logID);
@@ -151,7 +151,7 @@ public class LogentriesAppender extends AppenderSkeleton {
     /**
      * Implements AppenderSkeleton Append method, handles time and format
      *
-     * @event event to log
+     * @param event event to log
      */
     @Override
     protected void append(LoggingEvent event) {

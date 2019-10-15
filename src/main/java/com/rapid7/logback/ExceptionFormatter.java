@@ -5,11 +5,9 @@ import ch.qos.logback.classic.spi.StackTraceElementProxy;
 
 /**
  * Formatter to generate Logentries-compatible stack traces.
- * <p>
  * <p>The Logentries TCP token input is delimited by a traditional newline '\n'
  * char, so multiline events like stack traces should use the unicode line
  * separator.</p>
- * <p>
  * <p>This class simplifies the coercion of logged exceptions into events that
  * can be easily viewed and searched through <a
  * href="https://logentries.com">Logentries</a>.</p>
@@ -29,7 +27,6 @@ public class ExceptionFormatter {
 
     /**
      * Returns a formatted stack trace for an exception.
-     * <p>
      * <p>This method provides a full (non-truncated) trace delimited by
      * {@link #DELIMITER}. Currently it doesn't make any use of Java 7's <a
      * href="http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html#suppressed-exceptions">exception

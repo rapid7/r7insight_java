@@ -18,7 +18,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * <p>
  * a Rapid7™ service
  * <p>
- * <p>
  * VERSION: 1.2.0
  *
  * @author Viliam Holub
@@ -168,6 +167,8 @@ public final class AsyncLogger {
 
     /**
      * Initializes asynchronous logging.
+     *
+     * @param configuration logger options
      */
     public AsyncLogger(LoggerConfiguration configuration) {
 

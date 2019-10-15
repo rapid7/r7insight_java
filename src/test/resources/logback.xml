@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
-
-	<appender name="LE"
-		class="com.rapid7.logback.LogentriesAppender">
+	<appender name="LE" class="com.rapid7.logback.LogentriesAppender">
 		<Token>0c7407d4-fd0d-4436-bb50-44f1266b4490</Token>
 		<Region>eu</Region>
-		<Debug>False</Debug>
 		<Ssl>true</Ssl>
 		<facility>USER</facility>
 		<dataHubAddr>localhost</dataHubAddr>

@@ -8,6 +8,7 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.net.SyslogConstants;
 import com.rapid7.net.AsyncLogger;
+import com.rapid7.net.LoggerConfiguration;
 
 /**
  * Logentries appender for logback.
@@ -25,7 +26,9 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Asynchronous Background logger
      */
-    private final AsyncLogger le_async;
+    AsyncLogger iopsAsync;
+
+    private final LoggerConfiguration.Builder configurationBuilder;
     /**
      * Layout
      */
@@ -40,22 +43,13 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * Creates a new Logentries appender.
      */
     public LogentriesAppender() {
-        this.le_async = new AsyncLogger();
+        configurationBuilder = new LoggerConfiguration.Builder();
     }
 
-    /**
-     * Creates a new Logentries appender.
-     * <p>Used for unit testing.</p>
-     *
-     * @param logger the {@link AsyncLogger} to dispatch events
-     */
-    public LogentriesAppender(AsyncLogger logger) {
-        this.le_async = logger;
-    }
 
-	/*
+    /*
      * Public methods to send logback parameters to AsyncLogger
-	 */
+     */
 
     /**
      * Sets the token.
@@ -63,7 +57,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param token
      */
     public void setToken(String token) {
-        this.le_async.setToken(token);
+        this.configurationBuilder.useToken(token);
     }
 
     /**
@@ -72,35 +66,35 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param region
      */
     public void setRegion(String region) {
-        this.le_async.setRegion(region);
+        this.configurationBuilder.inRegion(region);
     }
 
     /**
      * Sets the HTTP PUTflag. <p>Send logs via HTTP PUT instead of default Token
      * TCP.</p>
      *
-     * @param HttpPut true to use HTTP PUT API
+     * @param httpPut true to use HTTP PUT API
      */
-    public void setHttpPut(boolean HttpPut) {
-        this.le_async.setHttpPut(HttpPut);
+    public void setHttpPut(boolean httpPut) {
+        this.configurationBuilder.useHttpPut(httpPut);
     }
 
     /**
      * Sets the ACCOUNT KEY value for HTTP PUT.
      *
-     * @param account_key
+     * @param accountKey
      */
-    public void setKey(String account_key) {
-        this.le_async.setKey(account_key);
+    public void setKey(String accountKey) {
+        this.configurationBuilder.useAccountKey(accountKey);
     }
 
     /**
      * Sets the LOCATION value for HTTP PUT.
      *
-     * @param log_location
+     * @param logLocation
      */
-    public void setLocation(String log_location) {
-        this.le_async.setLocation(log_location);
+    public void setLocation(String logLocation) {
+        this.configurationBuilder.httpPutLocation(logLocation);
     }
 
     /**
@@ -109,7 +103,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param ssl
      */
     public void setSsl(boolean ssl) {
-        this.le_async.setSsl(ssl);
+        this.configurationBuilder.useSSL(ssl);
     }
 
     /**
@@ -120,7 +114,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param debug debug flag to set
      */
     public void setDebug(boolean debug) {
-        this.le_async.setDebug(debug);
+        this.configurationBuilder.runInDebugMode(debug);
     }
 
     /**
@@ -129,7 +123,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param useDataHub set to true to send log messaged to a DataHub instance.
      */
     public void setIsUsingDataHub(boolean useDataHub) {
-        this.le_async.setUseDataHub(useDataHub);
+        this.configurationBuilder.useDataHub(useDataHub);
     }
 
     /**
@@ -138,7 +132,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param dataHubAddr address like "127.0.0.1"
      */
     public void setDataHubAddr(String dataHubAddr) {
-        this.le_async.setDataHubAddr(dataHubAddr);
+        this.configurationBuilder.toServerAddress(dataHubAddr);
     }
 
     /**
@@ -147,7 +141,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param dataHubPort
      */
     public void setDataHubPort(int dataHubPort) {
-        this.le_async.setDataHubPort(dataHubPort);
+        this.configurationBuilder.toServerPort(dataHubPort);
     }
 
     /**
@@ -156,7 +150,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param logHostName
      */
     public void setLogHostName(boolean logHostName) {
-        this.le_async.setLogHostName(logHostName);
+        this.configurationBuilder.logHostNameAsPrefix(logHostName);
     }
 
     /**
@@ -165,7 +159,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param hostName
      */
     public void setHostName(String hostName) {
-        this.le_async.setHostName(hostName);
+        this.configurationBuilder.useAsHostName(hostName);
     }
 
     /**
@@ -174,7 +168,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * @param logID
      */
     public void setLogID(String logID) {
-        this.le_async.setLogID(logID);
+        this.configurationBuilder.setLogIdPrefix(logID);
     }
 
     /**
@@ -191,6 +185,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
         if (layout == null) {
             layout = buildLayout();
         }
+        this.iopsAsync = new AsyncLogger(configurationBuilder.build());
         super.start();
     }
 
@@ -244,7 +239,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
         // Render the event according to layout
         String formattedEvent = layout.doLayout(event);
         // Prepare to be queued
-        this.le_async.addLineToQueue(formattedEvent);
+        this.iopsAsync.addLineToQueue(formattedEvent);
     }
 
     /**
@@ -253,7 +248,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     @Override
     public void stop() {
         super.stop();
-        this.le_async.close();
+        this.iopsAsync.close();
     }
 
     public Layout<ILoggingEvent> buildLayout() {

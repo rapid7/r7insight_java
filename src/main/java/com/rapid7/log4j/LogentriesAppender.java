@@ -1,6 +1,7 @@
 package com.rapid7.log4j;
 
 import com.rapid7.net.AsyncLogger;
+import com.rapid7.net.LoggerConfiguration;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -11,21 +12,23 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class LogentriesAppender extends AppenderSkeleton {
 
-	/*
-	 * Fields
-	 */
+    /*
+     * Fields
+     */
     /**
      * Asynchronous Background logger
      */
-    AsyncLogger le_async;
+    AsyncLogger iopsAsync;
+
+    private final LoggerConfiguration.Builder configurationBuilder;
 
     public LogentriesAppender() {
-        le_async = new AsyncLogger();
+        configurationBuilder = new LoggerConfiguration.Builder();
     }
 
-	/*
-	 * Public methods to send log4j parameters to AsyncLogger
-	 */
+    /*
+     * Public methods to send log4j parameters to AsyncLogger
+     */
 
     /**
      * Sets the token
@@ -33,7 +36,7 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param token
      */
     public void setToken(String token) {
-        this.le_async.setToken(token);
+        this.configurationBuilder.useToken(token);
     }
 
     /**
@@ -42,34 +45,34 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param region
      */
     public void setRegion(String region) {
-        this.le_async.setRegion(region);
+        this.configurationBuilder.inRegion(region);
     }
 
     /**
      * Sets the HTTP PUT boolean flag. Send logs via HTTP PUT instead of default Token TCP
      *
-     * @param HttpPut HttpPut flag to set
+     * @param httpPut HttpPut flag to set
      */
-    public void setHttpPut(boolean HttpPut) {
-        this.le_async.setHttpPut(HttpPut);
+    public void setHttpPut(boolean httpPut) {
+        this.configurationBuilder.useHttpPut(httpPut);
     }
 
     /**
      * Sets the ACCOUNT KEY value for HTTP PUT
      *
-     * @param account_key
+     * @param accountKey
      */
-    public void setKey(String account_key) {
-        this.le_async.setKey(account_key);
+    public void setKey(String accountKey) {
+        this.configurationBuilder.useAccountKey(accountKey);
     }
 
     /**
      * Sets the LOCATION value for HTTP PUT
      *
-     * @param log_location
+     * @param logLocation
      */
-    public void setLocation(String log_location) {
-        this.le_async.setLocation(log_location);
+    public void setLocation(String logLocation) {
+        this.configurationBuilder.httpPutLocation(logLocation);
     }
 
     /**
@@ -78,7 +81,7 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param ssl
      */
     public void setSsl(boolean ssl) {
-        this.le_async.setSsl(ssl);
+        this.configurationBuilder.useSSL(ssl);
     }
 
     /**
@@ -88,7 +91,7 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param debug debug flag to set
      */
     public void setDebug(boolean debug) {
-        this.le_async.setDebug(debug);
+        this.configurationBuilder.runInDebugMode(debug);
     }
 
     /**
@@ -97,7 +100,7 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param useDataHub set to true to send log messaged to a DataHub instance.
      */
     public void setIsUsingDataHub(boolean useDataHub) {
-        this.le_async.setUseDataHub(useDataHub);
+        this.configurationBuilder.useDataHub(useDataHub);
     }
 
     /**
@@ -106,7 +109,7 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param dataHubAddr address like "127.0.0.1"
      */
     public void setDataHubAddr(String dataHubAddr) {
-        this.le_async.setDataHubAddr(dataHubAddr);
+        this.configurationBuilder.toServerAddress(dataHubAddr);
     }
 
     /**
@@ -115,7 +118,7 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param dataHubPort
      */
     public void setDataHubPort(int dataHubPort) {
-        this.le_async.setDataHubPort(dataHubPort);
+        this.configurationBuilder.toServerPort(dataHubPort);
     }
 
     /**
@@ -124,7 +127,7 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param logHostName
      */
     public void setLogHostName(boolean logHostName) {
-        this.le_async.setLogHostName(logHostName);
+        this.configurationBuilder.logHostNameAsPrefix(logHostName);
     }
 
     /**
@@ -133,16 +136,16 @@ public class LogentriesAppender extends AppenderSkeleton {
      * @param hostName
      */
     public void setHostName(String hostName) {
-        this.le_async.setHostName(hostName);
+        this.configurationBuilder.useAsHostName(hostName);
     }
 
     /**
-     * Sets LogID parameter from the configuration
+     * Sets LogID parameter from the configuration, it will appear as prefix in any log line
      *
      * @param logID
      */
     public void setLogID(String logID) {
-        this.le_async.setLogID(logID);
+        this.configurationBuilder.setLogIdPrefix(logID);
     }
 
     /**
@@ -171,7 +174,7 @@ public class LogentriesAppender extends AppenderSkeleton {
         }
 
         // Prepare to be queued
-        this.le_async.addLineToQueue(formattedEvent);
+        this.iopsAsync.addLineToQueue(formattedEvent);
     }
 
     /**
@@ -179,11 +182,17 @@ public class LogentriesAppender extends AppenderSkeleton {
      */
     @Override
     public void close() {
-        this.le_async.close();
+        this.iopsAsync.close();
     }
 
     @Override
     public boolean requiresLayout() {
         return true;
+    }
+
+    @Override
+    public void activateOptions() {
+        iopsAsync = new AsyncLogger(configurationBuilder.build());
+        super.activateOptions();
     }
 }

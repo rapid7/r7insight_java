@@ -1,10 +1,10 @@
-[Please see our documentation page for usage information](https://insightops.help.rapid7.com/v1.0/docs/libraries)
+[Please see our documentation page for usage information](https://insightops.help.rapid7.com/docs/libraries)
 -------
 
 Logging To InsightOps from Java
 ==============================
 
-Logentries currently supports logging from Java using the following logging libraries:
+InsightOps currently supports logging from Java using the following logging libraries:
 
 * [Log4J](https://insightops.help.rapid7.com/docs/log4j-log4j2)
 * [Log4J2](https://insightops.help.rapid7.com/docs/log4j-log4j2)
@@ -42,12 +42,10 @@ Logentries handler configuration (e.g. to support different tokens).
     ```
     logger1.com.rapid7.jul.LogentriesHandler.token=4ff1cb0a-beea-4616-b647-1c113de8e7bb
     logger1.com.rapid7.jul.LogentriesHandler.region=eu
-    logger1.com.rapid7.jul.LogentriesHandler.port=10000
     logger1.com.rapid7.jul.LogentriesHandler.formatter=java.util.logging.SimpleFormatter
     
     logger2.com.rapid7.jul.LogentriesHandler.token=a70d9089-576c-4668-9641-14995d493a62
     logger2.com.rapid7.jul.LogentriesHandler.region=eu
-    logger2.com.rapid7.jul.LogentriesHandler.port=10000
     logger2.com.rapid7.jul.LogentriesHandler.formatter=java.util.logging.SimpleFormatter
     ```
 

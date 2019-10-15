@@ -1,10 +1,12 @@
 package com.rapid7.logback;
 
-import com.rapid7.net.AsyncLogger;
-import junit.framework.Assert;
-import org.junit.Before;
+import com.rapid7.util.SocketChannelReceiver;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.rapid7.util.LogMessageValidator.validateLogMessage;
+import static junit.framework.TestCase.assertEquals;
 
 public class LogentriesAppenderTest {
 
@@ -12,54 +14,61 @@ public class LogentriesAppenderTest {
     private static final String region = "some-region";
     private static final String location = "some location";
     private static final String accountKey = "account key";
-    private AsyncLogger client;
-    private LogentriesAppender le;
+    private static final String address = "192.168.0.2";
+    private static final boolean debug = true;
+    private static final String hostname = "server1";
+    private static final String logId = "LogId";
+    private static final int port = 1000;
 
-    @Before
-    public void setUp() {
-        client = Mockito.mock(AsyncLogger.class);
-        le = new LogentriesAppender(client);
-    }
+    private static final String EMPTY_PREFIX = "";
 
     @Test
     public void setterTests() {
-        boolean doPut = true;
-        boolean useSSL = true;
-
-        le.setHttpPut(doPut);
+        LogentriesAppender le = new LogentriesAppender();
+        le.setHttpPut(true);
         le.setToken(token);
         le.setRegion(region);
         le.setLocation(location);
         le.setKey(accountKey);
-        le.setSsl(useSSL);
-
-        Mockito.verify(client).setHttpPut(doPut);
-        Mockito.verify(client).setToken(token);
-        Mockito.verify(client).setRegion(region);
-        Mockito.verify(client).setLocation(location);
-        Mockito.verify(client).setKey(accountKey);
-        Mockito.verify(client).setSsl(useSSL);
+        le.setSsl(true);
+        le.setDataHubAddr(address);
+        le.setDataHubPort(port);
+        le.setDebug(debug);
+        le.setHostName(hostname);
+        le.setLogHostName(true);
+        le.setLogID(logId);
+        le.start();
+        assertEquals(le.iopsAsync.getToken(), token);
+        assertEquals(le.iopsAsync.getRegion(), region);
+        assertEquals(le.iopsAsync.getHttpPut(), true);
+        assertEquals(le.iopsAsync.getKey(), accountKey);
+        assertEquals(le.iopsAsync.getLocation(), location);
+        assertEquals(le.iopsAsync.getSsl(), true);
+        assertEquals(le.iopsAsync.getDataHubAddr(), address);
+        assertEquals(le.iopsAsync.getDataHubPort(), port);
+        assertEquals(le.iopsAsync.getHostName(), hostname);
+        assertEquals(le.iopsAsync.getLogID(), logId);
+        assertEquals(le.iopsAsync.getDebug(), debug);
     }
 
     @Test
-    public void testStart() {
+    public void testCreateAppenderAndLogMessage() throws Exception {
+        final String message = "a message to log using logback in tls mode";
+        final String exceptionMessage = "ERROR logentries - failure";
+        final String token = "0c7407d4-fd0d-4436-bb50-44f1266b4490";
+        SocketChannelReceiver receiver = null;
         try {
-            le.start();
-        } catch (Throwable t) {
-            Assert.fail("Shouldn't throw exception on startup!");
-            return;
+            receiver = SocketChannelReceiver.createAndStartReceiver(20000, true);
+            Logger logback = LoggerFactory.getLogger("logentries");
+            logback.info(message);
+            receiver.pollMessage();// skipping library init
+            validateLogMessage(token, EMPTY_PREFIX, message, receiver.pollMessage());
+            logback.error("failure", new RuntimeException("error").initCause(new RuntimeException("cause")));
+            validateLogMessage(token, exceptionMessage, "", receiver.pollMessage());
+        } finally {
+            receiver.close();
         }
-        Assert.assertTrue("No exception thrown", true);
     }
 
-    @Test
-    public void testStop() {
-        try {
-            le.stop();
-        } catch (Throwable t) {
-            Assert.fail("Shouldn't throw exception on shutdown!");
-            return;
-        }
-        Assert.assertTrue("No exception thrown", true);
-    }
+
 }

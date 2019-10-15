@@ -1,21 +1,21 @@
 package com.rapid7.net;
 
+import com.google.common.base.Strings;
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import static com.rapid7.Constants.HTTP_ENDPOINT_TEMPLATE;
 import static com.rapid7.Constants.DATA_ENDPOINT_TEMPLATE;
 
 /**
- * Client for sending messages to Logentries via HTTP PUT or Token-Based Logging
+ * Client for sending messages to InsightOPS via HTTP PUT or Token-Based Logging
  * Supports SSL/TLS
  *
- * @author Mark Lacomber
  */
-public class LogentriesClient {
+public class InsightOpsClient {
     /*
      * Constants
 	 */
@@ -23,56 +23,53 @@ public class LogentriesClient {
     /**
      * Port number for HTTP PUT/Token TCP logging on Logentries server.
      */
-    private static final int LE_PORT = 80;
+    private static final int IOPS_PORT = 80;
     /**
      * Port number for SSL HTTP PUT/TLS Token TCP logging on Logentries server.
      */
-    private static final int LE_SSL_PORT = 443;
+    private static final int IOPS_SSL_PORT = 443;
 
     final SSLSocketFactory ssl_factory;
-    private boolean ssl_choice = false;
+    private boolean ssl_choice;
     private boolean http_choice = false;
     private Socket socket;
     private OutputStream stream;
-    private int dataHubPort = LE_PORT;
-    private boolean useDataHub = false;
+    private int port;
     private String dataEndpoint;
-    private String httpEndpoint;
-    private String dataHubServer = dataEndpoint;
 
-    public LogentriesClient(boolean httpPut, boolean ssl, boolean isUsingDataHub, String server, int port, String region) {
+    public InsightOpsClient(boolean httpPut, boolean ssl, boolean isUsingDataHub, String server, int port, String region) {
         if (isUsingDataHub) {
             ssl_factory = null; // DataHub does not support input over SSL for now,
             this.ssl_choice = false; // so SSL flag is ignored
-            useDataHub = true;
-            dataHubServer = server;
-            dataHubPort = port;
         } else {
             ssl_factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
             ssl_choice = ssl;
             http_choice = httpPut;
         }
-        dataEndpoint = String.format(DATA_ENDPOINT_TEMPLATE, region);
-        httpEndpoint = String.format(HTTP_ENDPOINT_TEMPLATE, region);
+        setPort(port, ssl);
+        setAddress(server, region);
     }
 
-    public int getPort() {
-        if (useDataHub) {
-            return dataHubPort;
-        } else if (ssl_choice) {
-            return LE_SSL_PORT;
+    private void setPort(int port, boolean ssl_choice){
+        if (port > 0) { //use the specified port if provided
+            this.port =  port;
+        } else {
+            this.port = ssl_choice ? IOPS_SSL_PORT : IOPS_PORT;
         }
+    }
 
-        return LE_PORT;
+    private void setAddress(String server, String region){
+        if (Strings.isNullOrEmpty(server)) {
+            this.dataEndpoint = String.format(DATA_ENDPOINT_TEMPLATE, region);
+        } else {
+            this.dataEndpoint = server;
+        }
+    }
+    public int getPort() {
+        return port;
     }
 
     public String getAddress() {
-        if (useDataHub) {
-            return dataHubServer;
-        } else if (http_choice) {
-            return httpEndpoint;
-        }
-
         return dataEndpoint;
     }
 

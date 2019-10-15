@@ -1,34 +1,61 @@
 package com.rapid7.jul;
 
 
+import com.rapid7.util.SocketChannelReceiver;
 import org.junit.After;
 import org.junit.Test;
 
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static com.rapid7.util.LogMessageValidator.validateLogMessage;
 
 public class LogentriesHandlerTest {
 
     @After
-    public void resetLogger() {
+    public void cleanUpConfiguration() {
         LogManager.getLogManager().reset();
     }
 
+    private static final String EMPTY_PREFIX = "";
+
+    /**
+     * This test needs the unit_test_key_store.jks certificate to be added to Trust Store, this is done in the pom.xml
+     *
+     * @throws Exception
+     */
     @Test
-    public void singleLogger() throws Exception {
-        final String message = "a message to log";
+    public void singleLoggerDefaultTls() throws Exception {
+        final String message = "a message to log in tls";
         final String token = "0c7407d4-fd0d-4436-bb50-44f1266b4490";
         SocketChannelReceiver receiver = null;
         try {
-            receiver = SocketChannelReceiver.createAndStartReceiver(10000);
+            receiver = SocketChannelReceiver.createAndStartReceiver(20000, true);
+            LogManager.getLogManager().readConfiguration(getClass()
+                    .getClassLoader().getResourceAsStream("logging_single_handler_tls.properties"));
+            Logger logger = Logger.getLogger("logger");
+            logger.info(message);
+            receiver.pollMessage();// skipping library init
+            validateLogMessage(token, EMPTY_PREFIX, message, receiver.pollMessage());
+        } finally {
+            receiver.close();
+        }
+    }
+
+    @Test
+    public void singleLoggerNoTls() throws Exception {
+        final String message = "a message to log";
+        final String token = "0c7407d4-fd0d-4436-bb50-44f1266b4490";
+        final String prefix = "aLogId HostName=localhost";
+        SocketChannelReceiver receiver = null;
+        try {
+            receiver = SocketChannelReceiver.createAndStartReceiver(10000, false);
             LogManager.getLogManager().readConfiguration(getClass()
                     .getClassLoader().getResourceAsStream("logging_single_handler.properties"));
             Logger logger = Logger.getLogger("logger");
             logger.info(message);
-            validateLogMessage(token, message, receiver.pollMessage());
+            receiver.pollMessage();// skipping library init
+            validateLogMessage(token, prefix, message, receiver.pollMessage());
         } finally {
             receiver.close();
         }
@@ -43,26 +70,22 @@ public class LogentriesHandlerTest {
         SocketChannelReceiver receiverLogger1 = null;
         SocketChannelReceiver receiverLogger2 = null;
         try {
-            receiverLogger1 = SocketChannelReceiver.createAndStartReceiver(10000);
-            receiverLogger2 = SocketChannelReceiver.createAndStartReceiver(10001);
+            receiverLogger1 = SocketChannelReceiver.createAndStartReceiver(10000, false);
+            receiverLogger2 = SocketChannelReceiver.createAndStartReceiver(10001, false);
             LogManager.getLogManager().readConfiguration(getClass()
                     .getClassLoader().getResourceAsStream("logging_multiple_handlers.properties"));
             Logger log1 = Logger.getLogger("logger1");
             Logger log2 = Logger.getLogger("logger2");
             log1.info(messageLogger1);
-            validateLogMessage(tokenLogger1, messageLogger1, receiverLogger1.pollMessage());
+            receiverLogger1.pollMessage();// skipping library init
+            validateLogMessage(tokenLogger1, EMPTY_PREFIX, messageLogger1, receiverLogger1.pollMessage());
             log2.info(messageLogger2);
-            validateLogMessage(tokenLogger2, messageLogger2, receiverLogger2.pollMessage());
+            receiverLogger2.pollMessage();// skipping library init
+            validateLogMessage(tokenLogger2, EMPTY_PREFIX, messageLogger2, receiverLogger2.pollMessage());
         } finally {
             receiverLogger1.close();
             receiverLogger2.close();
         }
-    }
-
-    private void validateLogMessage(String token, String message, String logLine) {
-        assertTrue( "Log line length verification" , logLine.length() > token.length() + message.length());
-        assertEquals("Token verification", token, logLine.split(" ")[0]);
-        assertEquals("Log Message verification", message, logLine.substring(logLine.length() - message.length() - 1, logLine.length() - 1));
     }
 
 }

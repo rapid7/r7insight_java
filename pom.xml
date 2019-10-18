@@ -10,18 +10,12 @@
         <disruptor.version>3.3.6</disruptor.version>
     </properties>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
-
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.rapid7</groupId>
     <artifactId>r7insight_java</artifactId>
     <packaging>jar</packaging>
     <name>r7insight_java</name>
-    <version>1.1.40-SNAPSHOT</version>
+    <version>1.1.40</version>
     <description>Contains logback, log4j, and log4j2 appenders that will send log data to Logentries</description>
     <url>https://github.com/rapid7/r7insight_java</url>
     <licenses>
@@ -101,20 +95,6 @@
             </activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>

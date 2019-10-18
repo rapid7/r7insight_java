@@ -54,7 +54,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Sets the token.
      *
-     * @param token
+     * @param token Insight OPS token
      */
     public void setToken(String token) {
         this.configurationBuilder.useToken(token);
@@ -63,7 +63,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Sets the region.
      *
-     * @param region
+     * @param region region to send the log to (e.g. eu or us)
      */
     public void setRegion(String region) {
         this.configurationBuilder.inRegion(region);
@@ -82,7 +82,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Sets the ACCOUNT KEY value for HTTP PUT.
      *
-     * @param accountKey
+     * @param accountKey account key value (for http put only)
      */
     public void setKey(String accountKey) {
         this.configurationBuilder.useAccountKey(accountKey);
@@ -91,7 +91,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Sets the LOCATION value for HTTP PUT.
      *
-     * @param logLocation
+     * @param logLocation location on server (for http put only)
      */
     public void setLocation(String logLocation) {
         this.configurationBuilder.httpPutLocation(logLocation);
@@ -100,7 +100,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Sets the SSL boolean flag
      *
-     * @param ssl
+     * @param ssl true to send logs encrypted over ssl/tls
      */
     public void setSsl(boolean ssl) {
         this.configurationBuilder.useSSL(ssl);
@@ -108,7 +108,6 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
 
     /**
      * Sets the debug flag.
-     * <p>
      * <p>Appender in debug mode will print error messages on error console.</p>
      *
      * @param debug debug flag to set
@@ -138,7 +137,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Sets the port number on which DataHub instance waits for log messages.
      *
-     * @param dataHubPort
+     * @param dataHubPort data hub port number
      */
     public void setDataHubPort(int dataHubPort) {
         this.configurationBuilder.toServerPort(dataHubPort);
@@ -147,7 +146,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Determines whether to send HostName alongside with the log message
      *
-     * @param logHostName
+     * @param logHostName true to add server host name as log prefix
      */
     public void setLogHostName(boolean logHostName) {
         this.configurationBuilder.logHostNameAsPrefix(logHostName);
@@ -156,7 +155,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Sets the HostName from the configuration
      *
-     * @param hostName
+     * @param hostName host name value
      */
     public void setHostName(String hostName) {
         this.configurationBuilder.useAsHostName(hostName);
@@ -165,16 +164,16 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Sets LogID parameter from the configuration
      *
-     * @param logID
+     * @param logID log prefix
      */
     public void setLogID(String logID) {
         this.configurationBuilder.setLogIdPrefix(logID);
     }
 
     /**
-     * Sets the suffixPattern to be the <pattern> field in the .xml configuration file
+     * Sets the suffixPattern to be the pattern field in the .xml configuration file
      *
-     * @param encoder
+     * @param encoder Logback Pattern Layout Encoder
      */
     public void setEncoder(PatternLayoutEncoder encoder) {
         this.suffixPattern = encoder.getPattern();
@@ -197,6 +196,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * Returns the string value of the <b>Facility</b> option.
      * <p>
      * See {@link #setFacility} for the set of allowed values.
+     * @return facility name
      */
     public String getFacility() {
         return facilityStr;
@@ -207,9 +207,10 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * MAIL, DAEMON, AUTH, SYSLOG, LPR, NEWS, UUCP, CRON, AUTHPRIV, FTP, NTP,
      * AUDIT, ALERT, CLOCK, LOCAL0, LOCAL1, LOCAL2, LOCAL3, LOCAL4, LOCAL5,
      * LOCAL6, LOCAL7. Case is not important.
-     * <p>
      * <p>See {@link SyslogConstants} and RFC 3164 for more information about
      * the <b>Facility</b> option.
+     *
+     * @param facilityStr facility name
      */
     public void setFacility(String facilityStr) {
         if (facilityStr != null) {
@@ -224,6 +225,8 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
 
     /**
      * Sets the layout for the Appender
+     *
+     * @param layout logback layout
      */
     public void setLayout(Layout<ILoggingEvent> layout) {
         this.layout = layout;
@@ -232,7 +235,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Implements AppenderSkeleton Append method, handles time and format
      *
-     * @event event to log
+     * @param event event to log
      */
     @Override
     protected void append(ILoggingEvent event) {
@@ -264,9 +267,9 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     }
 
     /**
-     * See {@link #setSuffixPattern(String).
+     * See @link #setSuffixPattern(String).
      *
-     * @return
+     * @return suffix pattern
      */
     public String getSuffixPattern() {
         return suffixPattern;
@@ -276,7 +279,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * The <b>suffixPattern</b> option specifies the format of the
      * non-standardized part of the message sent to the syslog server.
      *
-     * @param suffixPattern
+     * @param suffixPattern suffix pattern
      */
     public void setSuffixPattern(String suffixPattern) {
         this.suffixPattern = suffixPattern;

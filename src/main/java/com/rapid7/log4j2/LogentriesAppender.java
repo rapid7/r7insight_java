@@ -15,7 +15,7 @@ import java.io.Serializable;
 
 /**
  * Log4J2 Appender that writes to Logentries.
- * <p/>
+ *
  * Created by josh on 11/15/14.
  */
 @Plugin(name = "Logentries", category = "Core", elementType = "appender", printObject = true)

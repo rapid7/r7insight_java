@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+	<appender name="LE" class="com.rapid7.logback.LogentriesAppender">
+		<Token>0c7407d4-fd0d-4436-bb50-44f1266b4490</Token>
+		<Region>eu</Region>
+		<Ssl>true</Ssl>
+		<facility>USER</facility>
+		<dataHubAddr>localhost</dataHubAddr>
+		<dataHubPort>20000</dataHubPort>
+		<debug>true</debug>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="debug">
+		<appender-ref ref="LE" />
+	</root>
+</configuration>

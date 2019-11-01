@@ -5,7 +5,7 @@
     <properties>
         <additionalparam>-Xdoclint:none</additionalparam>
         <guava.version>21.0</guava.version>
-        <jackson.version>2.4.2</jackson.version>
+        <jackson.version>2.10.0</jackson.version>
         <log4j.version>2.7</log4j.version>
         <disruptor.version>3.3.6</disruptor.version>
     </properties>

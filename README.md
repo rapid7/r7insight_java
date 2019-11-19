@@ -61,9 +61,3 @@ Logentries handler configuration (e.g. to support different tokens).
     Logger logger1 = Logger.getLogger("logger1");
     Logger logger2 = Logger.getLogger("logger2");
     ```
--------
-
-Contact Support
-===============
-
-Please email our support team at support@rapid7.com if you need any help.

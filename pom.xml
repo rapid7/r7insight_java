@@ -5,7 +5,7 @@
     <properties>
         <additionalparam>-Xdoclint:none</additionalparam>
         <guava.version>21.0</guava.version>
-        <jackson.version>2.4.2</jackson.version>
+        <jackson.version>2.10.1</jackson.version>
         <log4j.version>2.7</log4j.version>
         <disruptor.version>3.3.6</disruptor.version>
     </properties>
@@ -46,27 +46,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>animal-sniffer-maven-plugin</artifactId>
-                <version>1.15</version>
-                <configuration>
-                    <signature>
-                        <groupId>org.codehaus.mojo.signature</groupId>
-                        <artifactId>java16</artifactId>
-                        <version>1.1</version>
-                    </signature>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>ensure-java-1.6-class-library</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

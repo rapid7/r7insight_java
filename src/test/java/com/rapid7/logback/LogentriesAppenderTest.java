@@ -1,5 +1,7 @@
 package com.rapid7.logback;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.Context;
 import com.rapid7.util.SocketChannelReceiver;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -18,6 +20,8 @@ public class LogentriesAppenderTest {
     private static final boolean debug = true;
     private static final String hostname = "server1";
     private static final String logId = "LogId";
+    private static final String facility = "kern";
+    private static final Context context = new LoggerContext();
     private static final int port = 1000;
 
     private static final String EMPTY_PREFIX = "";
@@ -37,6 +41,8 @@ public class LogentriesAppenderTest {
         le.setHostName(hostname);
         le.setLogHostName(true);
         le.setLogID(logId);
+        le.setContext(context);
+        le.setFacility(facility);
         le.start();
         assertEquals(le.iopsAsync.getToken(), token);
         assertEquals(le.iopsAsync.getRegion(), region);

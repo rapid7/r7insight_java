@@ -11,7 +11,7 @@ import ch.qos.logback.core.net.SyslogConstants;
 import com.rapid7.net.AsyncLogger;
 import com.rapid7.net.LoggerConfiguration;
 
-import java.io.UnsupportedEncodingException;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Logentries appender for logback.
@@ -251,11 +251,8 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
         // Render the event according to layout
         byte[] encodedEvent = encoder.encode(event);
         String formattedEvent;
-        try {
-            formattedEvent = new String(encodedEvent, "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            formattedEvent = new String(encodedEvent);
-        }
+        formattedEvent = new String(encodedEvent, UTF_8);
+
         // Prepare to be queued
         this.iopsAsync.addLineToQueue(formattedEvent);
     }

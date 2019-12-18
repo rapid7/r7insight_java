@@ -188,7 +188,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     public void start() {
         if (encoder == null) {
             layout = layout == null ? buildLayout() : layout;
-            LayoutWrappingEncoder lwe = new LayoutWrappingEncoder<ILoggingEvent>();
+            LayoutWrappingEncoder<ILoggingEvent> lwe = new LayoutWrappingEncoder<>();
             lwe.setLayout(buildLayout());
             lwe.setContext(getContext());
             encoder = lwe;

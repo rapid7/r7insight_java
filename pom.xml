@@ -8,6 +8,7 @@
         <jackson.version>2.10.1</jackson.version>
         <log4j.version>2.7</log4j.version>
         <disruptor.version>3.3.6</disruptor.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +16,7 @@
     <artifactId>r7insight_java</artifactId>
     <packaging>jar</packaging>
     <name>r7insight_java</name>
-    <version>1.1.40</version>
+    <version>1.1.41</version>
     <description>Contains logback, log4j, and log4j2 appenders that will send log data to Logentries</description>
     <url>https://github.com/rapid7/r7insight_java</url>
     <licenses>
@@ -45,6 +46,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>
@@ -163,7 +165,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.11</version>
+            <version>1.2.3</version>
             <optional>true</optional>
         </dependency>
         <dependency>

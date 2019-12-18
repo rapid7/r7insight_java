@@ -1,14 +1,17 @@
 package com.rapid7.logback;
 
 import ch.qos.logback.classic.PatternLayout;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.pattern.SyslogStartConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
+import ch.qos.logback.core.encoder.Encoder;
+import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import ch.qos.logback.core.net.SyslogConstants;
 import com.rapid7.net.AsyncLogger;
 import com.rapid7.net.LoggerConfiguration;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Logentries appender for logback.
@@ -33,6 +36,8 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
      * Layout
      */
     private Layout<ILoggingEvent> layout;
+
+    private Encoder<ILoggingEvent> encoder;
     /**
      * Facility String
      */
@@ -171,18 +176,22 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     }
 
     /**
-     * Sets the suffixPattern to be the pattern field in the .xml configuration file
+     * Sets the encoder for this appender
      *
-     * @param encoder Logback Pattern Layout Encoder
+     * @param encoder Logback Encoder
      */
-    public void setEncoder(PatternLayoutEncoder encoder) {
-        this.suffixPattern = encoder.getPattern();
+    public void setEncoder(Encoder<ILoggingEvent> encoder) {
+        this.encoder = encoder;
     }
 
     @Override
     public void start() {
-        if (layout == null) {
-            layout = buildLayout();
+        if (encoder == null) {
+            layout = layout == null ? buildLayout() : layout;
+            LayoutWrappingEncoder<ILoggingEvent> lwe = new LayoutWrappingEncoder<>();
+            lwe.setLayout(buildLayout());
+            lwe.setContext(getContext());
+            encoder = lwe;
         }
         this.iopsAsync = new AsyncLogger(configurationBuilder.build());
         super.start();
@@ -240,7 +249,10 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
     @Override
     protected void append(ILoggingEvent event) {
         // Render the event according to layout
-        String formattedEvent = layout.doLayout(event);
+        byte[] encodedEvent = encoder.encode(event);
+        String formattedEvent;
+        formattedEvent = new String(encodedEvent, UTF_8);
+
         // Prepare to be queued
         this.iopsAsync.addLineToQueue(formattedEvent);
     }

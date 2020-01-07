@@ -15,6 +15,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Stub of InsightOPS server
  */
@@ -105,7 +107,6 @@ public class SocketChannelReceiver {
         return sslContext;
     }
 
-
     private synchronized void waitUntilReady() throws InterruptedException {
         if (!isReady) {
             wait(5000);
@@ -119,7 +120,7 @@ public class SocketChannelReceiver {
             if (messageLength == -1) {
                 continue;
             }
-            String[] messages = new String(Arrays.copyOf(buffer, messageLength)).split("\\r?\\n");
+            String[] messages = new String(Arrays.copyOf(buffer, messageLength), UTF_8).split("\\r?\\n");
             Collections.addAll(messagesReceived, messages);
         }
     }

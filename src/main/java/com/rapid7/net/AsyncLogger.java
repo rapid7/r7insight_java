@@ -1,7 +1,5 @@
 package com.rapid7.net;
 
-import com.google.common.base.Strings;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -10,8 +8,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.regex.Pattern;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * InsightOps Asynchronous Logger for integration with Java logging frameworks.
@@ -196,7 +192,7 @@ public final class AsyncLogger {
 
     private String calculateToken(LoggerConfiguration configuration) {
         if (!configuration.isHttpPut()
-                && (Strings.isNullOrEmpty(configuration.getToken()) || configuration.getToken().equals(CONFIG_TOKEN))) {
+                && (Utils.isNullOrEmpty(configuration.getToken()) || configuration.getToken().equals(CONFIG_TOKEN))) {
             //Check if set in an environment variable, used with PaaS providers
             String envToken = getEnvVar(CONFIG_TOKEN);
             if (envToken.equals("")) {
@@ -209,7 +205,7 @@ public final class AsyncLogger {
 
     private String calculateHostName(LoggerConfiguration configuration) {
         if (configuration.isLogHostName()) {
-            if (Strings.isNullOrEmpty(configuration.getHostName())) {
+            if (Utils.isNullOrEmpty(configuration.getHostName())) {
                 dbg("Host name is not defined by user - trying to obtain it from the environment.");
                 try {
                     return InetAddress.getLocalHost().getHostName();
@@ -376,14 +372,14 @@ public final class AsyncLogger {
      * Checks that key and location are set.
      */
     boolean checkCredentials() {
-        if (isNullOrEmpty(region)) {
+        if (Utils.isNullOrEmpty(region)) {
             dbg(INVALID_REGION);
             return false;
         }
         if (!httpPut) {
             return checkValidUUID(this.getToken());
         } else {
-            if (!checkValidUUID(this.getKey()) || isNullOrEmpty(location))
+            if (!checkValidUUID(this.getKey()) || Utils.isNullOrEmpty(location))
                 return false;
         }
         return true;
@@ -394,10 +390,10 @@ public final class AsyncLogger {
      */
     private String buildPrefixMessage() {
         StringBuilder sb = new StringBuilder();
-        if (!Strings.isNullOrEmpty(logID)) {
+        if (!Utils.isNullOrEmpty(logID)) {
             sb.append(logID).append(" "); // Append LogID and separator between logID and the rest part of the message.
         }
-        if (logHostName && !Strings.isNullOrEmpty(hostName)) {
+        if (logHostName && !Utils.isNullOrEmpty(hostName)) {
             sb.append("HostName=").append(hostName).append(" ");
         }
         return sb.toString();
@@ -608,7 +604,7 @@ public final class AsyncLogger {
 
                     // If message prefix (LogID + HostName) is not empty
                     // then add it to the message.
-                    if (!Strings.isNullOrEmpty(logMessagePrefix)) {
+                    if (!Utils.isNullOrEmpty(logMessagePrefix)) {
                         finalDataBuilder.append(logMessagePrefix);
                     }
 

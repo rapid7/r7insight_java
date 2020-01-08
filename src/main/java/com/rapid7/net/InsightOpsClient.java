@@ -1,7 +1,5 @@
 package com.rapid7.net;
 
-import com.google.common.base.Strings;
-
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
@@ -59,7 +57,7 @@ public class InsightOpsClient {
     }
 
     private void setAddress(String server, String region){
-        if (Strings.isNullOrEmpty(server)) {
+        if (Utils.isNullOrEmpty(server)) {
             this.dataEndpoint = String.format(DATA_ENDPOINT_TEMPLATE, region);
         } else {
             this.dataEndpoint = server;

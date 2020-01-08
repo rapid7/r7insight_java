@@ -4,7 +4,6 @@
 
     <properties>
         <additionalparam>-Xdoclint:none</additionalparam>
-        <guava.version>21.0</guava.version>
         <jackson.version>2.10.1</jackson.version>
         <log4j.version>2.7</log4j.version>
         <disruptor.version>3.3.6</disruptor.version>
@@ -16,7 +15,7 @@
     <artifactId>r7insight_java</artifactId>
     <packaging>jar</packaging>
     <name>r7insight_java</name>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <description>Contains logback, log4j, and log4j2 appenders that will send log data to Logentries</description>
     <url>https://github.com/rapid7/r7insight_java</url>
     <licenses>
@@ -179,11 +178,6 @@
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
         </dependency>
     </dependencies>
 </project>

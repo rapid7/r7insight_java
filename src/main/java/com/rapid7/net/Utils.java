@@ -3,7 +3,7 @@ package com.rapid7.net;
 /**
  * Utility class to avoid including external dependencies.
  * 
- * @since 1.1.41
+ * @since 3.0.1
  */
 final class Utils {
   // private constructor

@@ -10,6 +10,7 @@ lib
 release.properties
 *.db
 .DS_Store
+pom.xml.releaseBackup
 
 # IDEA files
 atlassian-ide-plugin.xml

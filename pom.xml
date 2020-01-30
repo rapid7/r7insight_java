@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <properties>
         <additionalparam>-Xdoclint:none</additionalparam>
@@ -15,7 +14,7 @@
     <artifactId>r7insight_java</artifactId>
     <packaging>jar</packaging>
     <name>r7insight_java</name>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1</version>
     <description>Contains logback, log4j, and log4j2 appenders that will send log data to Logentries</description>
     <url>https://github.com/rapid7/r7insight_java</url>
 
@@ -31,7 +30,7 @@
         <connection>scm:git:git@github.com:rapid7/r7insight_java.git</connection>
         <developerConnection>scm:git:git@github.com:rapid7/r7insight_java.git</developerConnection>
         <url>https://github.com/rapid7/r7insight_java</url>
-        <tag>HEAD</tag>
+        <tag>3.0.1</tag>
     </scm>
 
     <developers>

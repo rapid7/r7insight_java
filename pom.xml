@@ -4,7 +4,7 @@
     <properties>
         <additionalparam>-Xdoclint:none</additionalparam>
         <jackson.version>2.10.1</jackson.version>
-        <log4j.version>2.7</log4j.version>
+        <log4j.version>2.13.3</log4j.version>
         <disruptor.version>3.3.6</disruptor.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

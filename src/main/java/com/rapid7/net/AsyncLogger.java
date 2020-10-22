@@ -508,38 +508,33 @@ public final class AsyncLogger {
         /**
          * Opens connection to InsightOps.
          *
-         * @throws IOException
+         * @throws IOException Thrown if we fail to connect
          */
         void openConnection() throws IOException {
-            try {
-                if (this.iopsClient == null) {
-                    this.iopsClient = new InsightOpsClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
-                }
-                this.iopsClient.connect();
+            if (this.iopsClient == null) {
+                this.iopsClient = new InsightOpsClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
+            }
+            this.iopsClient.connect();
 
-                if (httpPut) {
-                    final String f = "PUT /%s/hosts/%s/?realtime=1 HTTP/1.1\r\n\r\n";
-                    final String header = String.format(f, key, location);
-                    byte[] temp = header.getBytes(ASCII);
-                    this.iopsClient.write(temp, 0, temp.length);
-                }
-
-            } catch (Exception e) {
-
+            if (httpPut) {
+                final String f = "PUT /%s/hosts/%s/?realtime=1 HTTP/1.1\r\n\r\n";
+                final String header = String.format(f, key, location);
+                byte[] temp = header.getBytes(ASCII);
+                this.iopsClient.write(temp, 0, temp.length);
             }
         }
 
         /**
          * Tries to opens connection to InsightOps until it succeeds.
          *
-         * @throws InterruptedException
+         * @throws InterruptedException Thrown when interrupted while sleeping >:(
          */
         void reopenConnection() throws InterruptedException {
             // Close the previous connection
             closeConnection();
 
             // Try to open the connection until we get through
-            int root_delay = MIN_DELAY;
+            int rootDelay = MIN_DELAY;
             while (true) {
                 try {
                     openConnection();
@@ -555,12 +550,12 @@ public final class AsyncLogger {
                 }
 
                 // Wait between connection attempts
-                root_delay *= 2;
-                if (root_delay > MAX_DELAY)
-                    root_delay = MAX_DELAY;
-                int wait_for = root_delay + random.nextInt(root_delay);
-                dbg("Waiting for " + wait_for + "ms");
-                Thread.sleep(wait_for);
+                rootDelay *= 2;
+                if (rootDelay > MAX_DELAY)
+                    rootDelay = MAX_DELAY;
+                int waitFor = rootDelay + random.nextInt(rootDelay);
+                dbg("Waiting for " + waitFor + "ms");
+                Thread.sleep(waitFor);
             }
         }
 

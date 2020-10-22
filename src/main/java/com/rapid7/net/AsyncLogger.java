@@ -554,8 +554,9 @@ public final class AsyncLogger {
 
                 // Wait between connection attempts
                 rootDelay *= 2;
-                if (rootDelay > MAX_DELAY)
+                if (rootDelay > MAX_DELAY) {
                     rootDelay = MAX_DELAY;
+                }
                 int waitFor = rootDelay + random.nextInt(rootDelay);
                 dbg("Waiting for " + waitFor + "ms");
                 Thread.sleep(waitFor);

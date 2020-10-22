@@ -102,8 +102,6 @@ public class InsightOpsClient {
                 this.socket.close();
                 this.socket = null;
             }
-        } catch (Exception e) {
-
-        }
+        } catch (Exception ignored) {}
     }
 }

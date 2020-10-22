@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -41,11 +42,11 @@ public final class AsyncLogger {
     /**
      * UTF-8 output character set.
      */
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
     /**
      * ASCII character set used by HTTP.
      */
-    private static final Charset ASCII = Charset.forName("US-ASCII");
+    private static final Charset ASCII = StandardCharsets.US_ASCII;
     /**
      * Minimal delay between attempts to reconnect in milliseconds.
      */
@@ -168,7 +169,7 @@ public final class AsyncLogger {
      */
     public AsyncLogger(LoggerConfiguration configuration) {
 
-        queue = new ArrayBlockingQueue<String>(QUEUE_SIZE);
+        queue = new ArrayBlockingQueue<>(QUEUE_SIZE);
         // Fill the queue with an identifier message for first entry sent to server
         queue.offer(LIBRARY_ID);
 
@@ -383,11 +384,8 @@ public final class AsyncLogger {
         }
         if (!httpPut) {
             return checkValidUUID(this.getToken());
-        } else {
-            if (!checkValidUUID(this.getKey()) || Utils.isNullOrEmpty(location))
-                return false;
         }
-        return true;
+        return checkValidUUID(this.getKey()) && !Utils.isNullOrEmpty(location);
     }
 
     /**
@@ -449,7 +447,7 @@ public final class AsyncLogger {
                 if (!queue.offer(line.substring(0, LOG_LENGTH_LIMIT)))
                     dbg(QUEUE_OVERFLOW);
             }
-            addLineToQueue(line.substring(LOG_LENGTH_LIMIT, line.length()), limit - 1);
+            addLineToQueue(line.substring(LOG_LENGTH_LIMIT), limit - 1);
 
         } else {
             // Try to append data to queue
@@ -584,7 +582,7 @@ public final class AsyncLogger {
 
                 // Use StringBuilder here because if use just overloaded
                 // + operator it may give much more work for allocator and GC.
-                StringBuilder finalDataBuilder = new StringBuilder("");
+                StringBuilder finalDataBuilder = new StringBuilder();
 
                 // Send data in queue
                 while (true) {
@@ -618,18 +616,18 @@ public final class AsyncLogger {
                     while (true) {
                         try {
                             this.iopsClient.write(finalLine, 0, finalLine.length);
+                            break;
                         } catch (IOException e) {
                             // Reopen the lost connection
                             reopenConnection();
-                            continue;
                         }
-                        break;
                     }
                 }
             } catch (InterruptedException e) {
                 // We got interrupted, stop
                 dbg("Asynchronous socket writer interrupted");
                 dbg("Queue had " + queue.size() + " lines left in it");
+                Thread.currentThread().interrupt();
             }
 
             closeConnection();

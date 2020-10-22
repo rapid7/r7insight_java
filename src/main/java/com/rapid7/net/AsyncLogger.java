@@ -359,6 +359,11 @@ public final class AsyncLogger {
         return true;
     }
 
+    //  VisibleForTesting
+    SocketAppender getAppender() {
+        return appender;
+    }
+
     /**
      * Try and retrieve environment variable for given key, return empty string if not found
      */

@@ -1,16 +1,36 @@
 package com.rapid7.net;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.PowerMockUtils;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.IOException;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mock;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(InsightOpsClient.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class AsyncLoggerTest {
 
     private static final String VALID_UUID = "a7ac14c3-2cc9-4f09-8fb3-73c5523e065c";
+
+    private static final AsyncLogger TEST_LOGGER = new AsyncLogger(
+            new LoggerConfiguration.Builder()
+                    .useToken("LOGENTRIES_TOKEN")
+                    .build());
 
     @Test
     public void testConfigurationNoParams() {
@@ -133,5 +153,15 @@ public class AsyncLoggerTest {
         assertFalse("checkValidUUID should return false for an empty string", async.checkValidUUID(""));
         assertFalse("checkValidUUID should return false for invalid uuid", async.checkValidUUID("not-a-uuid"));
         assertTrue("checkValidUUID should return true for valid uuid", async.checkValidUUID(VALID_UUID));
+    }
+
+    @Test(expected = IOException.class)
+    public void testOpenConnectionIOExceptionIsNotMasked() throws Exception {
+        InsightOpsClient client = PowerMockito.mock(InsightOpsClient.class);
+        doThrow(IOException.class).when(client).connect();
+
+        PowerMockito.whenNew(InsightOpsClient.class).withAnyArguments().thenReturn(client);
+
+        TEST_LOGGER.getAppender().openConnection();
     }
 }

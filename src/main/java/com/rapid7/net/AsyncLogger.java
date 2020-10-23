@@ -494,9 +494,11 @@ public final class AsyncLogger {
          * Random number generator for delays between reconnection attempts.
          */
         final Random random = new Random();
+
         /**
          * Logentries Client for connecting to InsightOPS via HTTP or TCP.
          */
+        // VisibleForTesting
         InsightOpsClient iopsClient;
 
         /**

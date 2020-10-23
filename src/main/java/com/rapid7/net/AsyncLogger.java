@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -41,11 +42,11 @@ public final class AsyncLogger {
     /**
      * UTF-8 output character set.
      */
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
     /**
      * ASCII character set used by HTTP.
      */
-    private static final Charset ASCII = Charset.forName("US-ASCII");
+    private static final Charset ASCII = StandardCharsets.US_ASCII;
     /**
      * Minimal delay between attempts to reconnect in milliseconds.
      */
@@ -168,7 +169,7 @@ public final class AsyncLogger {
      */
     public AsyncLogger(LoggerConfiguration configuration) {
 
-        queue = new ArrayBlockingQueue<String>(QUEUE_SIZE);
+        queue = new ArrayBlockingQueue<>(QUEUE_SIZE);
         // Fill the queue with an identifier message for first entry sent to server
         queue.offer(LIBRARY_ID);
 
@@ -359,6 +360,11 @@ public final class AsyncLogger {
         return true;
     }
 
+    //  VisibleForTesting
+    SocketAppender getAppender() {
+        return appender;
+    }
+
     /**
      * Try and retrieve environment variable for given key, return empty string if not found
      */
@@ -378,11 +384,8 @@ public final class AsyncLogger {
         }
         if (!httpPut) {
             return checkValidUUID(this.getToken());
-        } else {
-            if (!checkValidUUID(this.getKey()) || Utils.isNullOrEmpty(location))
-                return false;
         }
-        return true;
+        return checkValidUUID(this.getKey()) && !Utils.isNullOrEmpty(location);
     }
 
     /**
@@ -444,7 +447,7 @@ public final class AsyncLogger {
                 if (!queue.offer(line.substring(0, LOG_LENGTH_LIMIT)))
                     dbg(QUEUE_OVERFLOW);
             }
-            addLineToQueue(line.substring(LOG_LENGTH_LIMIT, line.length()), limit - 1);
+            addLineToQueue(line.substring(LOG_LENGTH_LIMIT), limit - 1);
 
         } else {
             // Try to append data to queue
@@ -491,9 +494,11 @@ public final class AsyncLogger {
          * Random number generator for delays between reconnection attempts.
          */
         final Random random = new Random();
+
         /**
          * Logentries Client for connecting to InsightOPS via HTTP or TCP.
          */
+        // VisibleForTesting
         InsightOpsClient iopsClient;
 
         /**
@@ -508,38 +513,33 @@ public final class AsyncLogger {
         /**
          * Opens connection to InsightOps.
          *
-         * @throws IOException
+         * @throws IOException Thrown if we fail to connect
          */
         void openConnection() throws IOException {
-            try {
-                if (this.iopsClient == null) {
-                    this.iopsClient = new InsightOpsClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
-                }
-                this.iopsClient.connect();
+            if (this.iopsClient == null) {
+                this.iopsClient = new InsightOpsClient(httpPut, ssl, useDataHub, dataHubAddr, dataHubPort, region);
+            }
+            this.iopsClient.connect();
 
-                if (httpPut) {
-                    final String f = "PUT /%s/hosts/%s/?realtime=1 HTTP/1.1\r\n\r\n";
-                    final String header = String.format(f, key, location);
-                    byte[] temp = header.getBytes(ASCII);
-                    this.iopsClient.write(temp, 0, temp.length);
-                }
-
-            } catch (Exception e) {
-
+            if (httpPut) {
+                final String f = "PUT /%s/hosts/%s/?realtime=1 HTTP/1.1\r\n\r\n";
+                final String header = String.format(f, key, location);
+                byte[] temp = header.getBytes(ASCII);
+                this.iopsClient.write(temp, 0, temp.length);
             }
         }
 
         /**
          * Tries to opens connection to InsightOps until it succeeds.
          *
-         * @throws InterruptedException
+         * @throws InterruptedException Thrown when interrupted while sleeping >:(
          */
         void reopenConnection() throws InterruptedException {
             // Close the previous connection
             closeConnection();
 
             // Try to open the connection until we get through
-            int root_delay = MIN_DELAY;
+            int rootDelay = MIN_DELAY;
             while (true) {
                 try {
                     openConnection();
@@ -555,12 +555,13 @@ public final class AsyncLogger {
                 }
 
                 // Wait between connection attempts
-                root_delay *= 2;
-                if (root_delay > MAX_DELAY)
-                    root_delay = MAX_DELAY;
-                int wait_for = root_delay + random.nextInt(root_delay);
-                dbg("Waiting for " + wait_for + "ms");
-                Thread.sleep(wait_for);
+                rootDelay *= 2;
+                if (rootDelay > MAX_DELAY) {
+                    rootDelay = MAX_DELAY;
+                }
+                int waitFor = rootDelay + random.nextInt(rootDelay);
+                dbg("Waiting for " + waitFor + "ms");
+                Thread.sleep(waitFor);
             }
         }
 
@@ -584,7 +585,7 @@ public final class AsyncLogger {
 
                 // Use StringBuilder here because if use just overloaded
                 // + operator it may give much more work for allocator and GC.
-                StringBuilder finalDataBuilder = new StringBuilder("");
+                StringBuilder finalDataBuilder = new StringBuilder();
 
                 // Send data in queue
                 while (true) {
@@ -618,18 +619,18 @@ public final class AsyncLogger {
                     while (true) {
                         try {
                             this.iopsClient.write(finalLine, 0, finalLine.length);
+                            break;
                         } catch (IOException e) {
                             // Reopen the lost connection
                             reopenConnection();
-                            continue;
                         }
-                        break;
                     }
                 }
             } catch (InterruptedException e) {
                 // We got interrupted, stop
                 dbg("Asynchronous socket writer interrupted");
                 dbg("Queue had " + queue.size() + " lines left in it");
+                Thread.currentThread().interrupt();
             }
 
             closeConnection();

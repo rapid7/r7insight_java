@@ -82,8 +82,7 @@ public class LogentriesAppenderTest {
         Layout<ILoggingEvent> layout = mock(EchoLayout.class);
         LoggingEvent loggingEvent = buildLoggingEvent();
 
-        String formattedText = "Formatted text";
-        when(layout.doLayout(loggingEvent)).thenReturn(formattedText);
+        when(layout.doLayout(loggingEvent)).thenReturn("formattedText");
 
         LogentriesAppender logentriesAppender = buildLogentriesAppender();
         logentriesAppender.setLayout(layout);

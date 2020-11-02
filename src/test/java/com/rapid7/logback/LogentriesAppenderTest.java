@@ -1,14 +1,29 @@
 package com.rapid7.logback;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.Context;
+import ch.qos.logback.core.Layout;
+import ch.qos.logback.core.layout.EchoLayout;
+import com.rapid7.net.AsyncLogger;
+import com.rapid7.net.LoggerConfiguration;
 import com.rapid7.util.SocketChannelReceiver;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.rapid7.util.LogMessageValidator.validateLogMessage;
 import static junit.framework.TestCase.assertEquals;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class LogentriesAppenderTest {
 
@@ -28,21 +43,7 @@ public class LogentriesAppenderTest {
 
     @Test
     public void setterTests() {
-        LogentriesAppender le = new LogentriesAppender();
-        le.setHttpPut(true);
-        le.setToken(token);
-        le.setRegion(region);
-        le.setLocation(location);
-        le.setKey(accountKey);
-        le.setSsl(true);
-        le.setDataHubAddr(address);
-        le.setDataHubPort(port);
-        le.setDebug(debug);
-        le.setHostName(hostname);
-        le.setLogHostName(true);
-        le.setLogID(logId);
-        le.setContext(context);
-        le.setFacility(facility);
+        LogentriesAppender le = buildLogentriesAppender();
         le.start();
         assertEquals(le.iopsAsync.getToken(), token);
         assertEquals(le.iopsAsync.getRegion(), region);
@@ -74,6 +75,50 @@ public class LogentriesAppenderTest {
         } finally {
             receiver.close();
         }
+    }
+
+    @Test
+    public void testSetCustomLayout() {
+        Layout<ILoggingEvent> layout = mock(EchoLayout.class);
+        LoggingEvent loggingEvent = buildLoggingEvent();
+
+        when(layout.doLayout(loggingEvent)).thenReturn("formattedText");
+
+        LogentriesAppender logentriesAppender = buildLogentriesAppender();
+        logentriesAppender.setLayout(layout);
+        logentriesAppender.start();
+        logentriesAppender.append(loggingEvent);
+
+        verify(layout).doLayout(eq(loggingEvent));
+    }
+
+    private LoggingEvent buildLoggingEvent() {
+        LoggingEvent loggingEvent = new LoggingEvent();
+
+        loggingEvent.setLevel(Level.ERROR);
+        loggingEvent.setLoggerName("test");
+        loggingEvent.setMessage("This is a test");
+
+        return loggingEvent;
+    }
+
+    private LogentriesAppender buildLogentriesAppender() {
+        LogentriesAppender le = new LogentriesAppender();
+        le.setHttpPut(true);
+        le.setToken(token);
+        le.setRegion(region);
+        le.setLocation(location);
+        le.setKey(accountKey);
+        le.setSsl(true);
+        le.setDataHubAddr(address);
+        le.setDataHubPort(port);
+        le.setDebug(debug);
+        le.setHostName(hostname);
+        le.setLogHostName(true);
+        le.setLogID(logId);
+        le.setContext(context);
+        le.setFacility(facility);
+        return le;
     }
 
 }

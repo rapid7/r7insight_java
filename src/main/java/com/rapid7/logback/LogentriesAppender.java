@@ -189,7 +189,7 @@ public class LogentriesAppender extends AppenderBase<ILoggingEvent> {
         if (encoder == null) {
             layout = layout == null ? buildLayout() : layout;
             LayoutWrappingEncoder<ILoggingEvent> lwe = new LayoutWrappingEncoder<>();
-            lwe.setLayout(buildLayout());
+            lwe.setLayout(layout);
             lwe.setContext(getContext());
             encoder = lwe;
         }

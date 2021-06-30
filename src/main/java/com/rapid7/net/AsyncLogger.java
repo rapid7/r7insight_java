@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.IllegalFormatException;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -438,7 +439,7 @@ public final class AsyncLogger {
             started = true;
         }
 
-        dbg("Queueing " + line);
+        dbg("Queueing %s", line);
 
         // If individual string is too long add it to the queue recursively as sub-strings
         if (line.length() > LOG_LENGTH_LIMIT) {
@@ -473,16 +474,33 @@ public final class AsyncLogger {
      *
      * @param msg message to display
      */
-    void dbg(String msg) {
+    void dbg(String msg, Object... argv) {
         if (debug) {
             if (!msg.endsWith(LINE_SEP)) {
-                System.err.println(IOPS + msg);
+                System.err.println(IOPS + String.format(msg, argv));
             } else {
-                System.err.print(IOPS + msg);
+                System.err.print(IOPS + String.format(msg, argv));
             }
         }
     }
 
+    void warn(String msg, Object... argv) {
+        try {
+            System.err.print(IOPS);
+            System.err.printf(msg, argv);
+            System.err.println();
+        } catch (IllegalFormatException e) {
+            System.err.println(msg);
+            System.err.println(IOPS + " suppressed IllegalFormatException");
+        }
+    }
+
+    void warn(Throwable t) {
+        if (t != null) {
+            System.err.print(IOPS);
+            t.printStackTrace(System.err);
+        }
+    }
 
     /**
      * Asynchronous over the socket appender.
@@ -508,6 +526,10 @@ public final class AsyncLogger {
             super("InsightOps Socket appender");
             // Don't block shut down
             setDaemon(true);
+            setUncaughtExceptionHandler((t, e) -> {
+                warn("uncaught exception from %s : %s", t.getName(), e.getMessage());
+                warn(e);
+            });
         }
 
         /**
@@ -535,6 +557,9 @@ public final class AsyncLogger {
          * @throws InterruptedException Thrown when interrupted while sleeping >:(
          */
         void reopenConnection() throws InterruptedException {
+
+            dbg("reopenConnection entered");
+
             // Close the previous connection
             closeConnection();
 
@@ -547,11 +572,9 @@ public final class AsyncLogger {
                     // Success, leave
                     return;
                 } catch (IOException e) {
-                    // Get information if in debug mode
-                    if (debug) {
-                        dbg("Unable to connect to InsightOps");
-                        e.printStackTrace();
-                    }
+                    // Always report failure
+                    warn("Unable to connect to InsightOps");
+                    warn(e);
                 }
 
                 // Wait between connection attempts
@@ -560,7 +583,7 @@ public final class AsyncLogger {
                     rootDelay = MAX_DELAY;
                 }
                 int waitFor = rootDelay + random.nextInt(rootDelay);
-                dbg("Waiting for " + waitFor + "ms");
+                warn("Waiting for %d ms", waitFor);
                 Thread.sleep(waitFor);
             }
         }
@@ -629,7 +652,11 @@ public final class AsyncLogger {
             } catch (InterruptedException e) {
                 // We got interrupted, stop
                 dbg("Asynchronous socket writer interrupted");
-                dbg("Queue had " + queue.size() + " lines left in it");
+                if (queue.isEmpty()) {
+                    dbg("interrupted; queue is empty");
+                } else {
+                    warn("interrupted; queue had %d lines left in it", queue.size());
+                }
                 Thread.currentThread().interrupt();
             }
 

@@ -526,12 +526,9 @@ public final class AsyncLogger {
             super("InsightOps Socket appender");
             // Don't block shut down
             setDaemon(true);
-            setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread t, Throwable e) {
-                    warn("uncaught exception from %s : %s", t.getName(), e.getMessage());
-                    warn(e);
-                }
+            setUncaughtExceptionHandler((t, e) -> {
+                warn("uncaught exception from %s : %s", t.getName(), e.getMessage());
+                warn(e);
             });
         }
 
@@ -561,7 +558,7 @@ public final class AsyncLogger {
          */
         void reopenConnection() throws InterruptedException {
 
-            warn("reopenConnection entered");
+            dbg("reopenConnection entered");
 
             // Close the previous connection
             closeConnection();

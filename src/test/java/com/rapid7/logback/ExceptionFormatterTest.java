@@ -2,10 +2,11 @@ package com.rapid7.logback;
 
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static junit.framework.TestCase.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ExceptionFormatterTest {
 
@@ -14,13 +15,13 @@ public class ExceptionFormatterTest {
         IThrowableProxy error = Mockito.mock(IThrowableProxy.class);
 
         StackTraceElementProxy l1 = Mockito.mock(StackTraceElementProxy.class);
-        Mockito.stub(l1.getSTEAsString()).toReturn("trace level 1");
+        Mockito.when(l1.getSTEAsString()).thenReturn("trace level 1");
 
         StackTraceElementProxy[] topLevel = new StackTraceElementProxy[]{l1};
 
-        Mockito.stub(error.getStackTraceElementProxyArray()).toReturn(topLevel);
-        Mockito.stub(error.getClassName()).toReturn("com.foo.SomeClass");
-        Mockito.stub(error.getMessage()).toReturn("err!");
+        Mockito.when(error.getStackTraceElementProxyArray()).thenReturn(topLevel);
+        Mockito.when(error.getClassName()).thenReturn("com.foo.SomeClass");
+        Mockito.when(error.getMessage()).thenReturn("err!");
 
         String trace = ExceptionFormatter.formatException(error);
         assertEquals(trace, "com.foo.SomeClass: err!" +

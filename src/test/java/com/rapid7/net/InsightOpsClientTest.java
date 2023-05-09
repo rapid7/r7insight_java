@@ -1,8 +1,8 @@
 package com.rapid7.net;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InsightOpsClientTest {
 
@@ -23,56 +23,56 @@ public class InsightOpsClientTest {
         String region = "eu";
         InsightOpsClient client = new InsightOpsClient(USE_HTTP_PUT, NOT_USE_SSL, NOT_USE_DATAHUB, "", 0, region);
         String expectedApiServer = String.format(API_TOKEN_SERVER, region);
-        assertEquals(expectedApiServer  + " should be used for HTTP PUT", client.getAddress(), expectedApiServer);
+        assertEquals(client.getAddress(), expectedApiServer, expectedApiServer  + " should be used for HTTP PUT");
 
         String expectedDataServer = String.format(API_TOKEN_SERVER, region);
         InsightOpsClient client2 = new InsightOpsClient(NOT_USE_HTTP_PUT, NOT_USE_SSL, NOT_USE_DATAHUB, "", 0, region);
-        assertEquals(expectedDataServer + " should be used for Token TCP", client2.getAddress(), expectedDataServer);
+        assertEquals(client2.getAddress(), expectedDataServer, expectedDataServer + " should be used for Token TCP");
 
         InsightOpsClient client3 = new InsightOpsClient(USE_HTTP_PUT, USE_SSL, USE_DATAHUB, "127.0.0.1", 10000, region);
-        assertEquals("Address 127.0.0.1 should be used over " + expectedApiServer, client3.getAddress(), DATAHUB_IP);
+        assertEquals(client3.getAddress(), DATAHUB_IP, "Address 127.0.0.1 should be used over " + expectedApiServer);
 
         InsightOpsClient client4 = new InsightOpsClient(USE_HTTP_PUT, NOT_USE_SSL, USE_DATAHUB, "127.0.0.1", 10000, region);
-        assertEquals("Address 127.0.0.1 should be used over " + expectedApiServer, client4.getAddress(), DATAHUB_IP);
+        assertEquals(client4.getAddress(), DATAHUB_IP, "Address 127.0.0.1 should be used over " + expectedApiServer);
 
         InsightOpsClient client5 = new InsightOpsClient(NOT_USE_HTTP_PUT, USE_SSL, USE_DATAHUB, "127.0.0.1", 10000, region);
-        assertEquals("Address 127.0.0.1 should be used over " + expectedApiServer, client5.getAddress(), DATAHUB_IP);
+        assertEquals(client5.getAddress(), DATAHUB_IP, "Address 127.0.0.1 should be used over " + expectedApiServer);
 
         InsightOpsClient client6 = new InsightOpsClient(NOT_USE_HTTP_PUT, NOT_USE_SSL, USE_DATAHUB, "127.0.0.1", 10000, region);
-        assertEquals("Address 127.0.0.1 should be used over " + expectedApiServer, client6.getAddress(), DATAHUB_IP);
+        assertEquals(client6.getAddress(), DATAHUB_IP, "Address 127.0.0.1 should be used over " + expectedApiServer);
 
         InsightOpsClient client7 = new InsightOpsClient(NOT_USE_HTTP_PUT, USE_SSL, NOT_USE_DATAHUB, "127.0.0.1", 10000, region);
-        assertEquals("Address 127.0.0.1 should be used over " + expectedApiServer, client5.getAddress(), DATAHUB_IP);
+        assertEquals(client5.getAddress(), DATAHUB_IP, "Address 127.0.0.1 should be used over " + expectedApiServer);
 
         InsightOpsClient client8 = new InsightOpsClient(NOT_USE_HTTP_PUT, NOT_USE_SSL, NOT_USE_DATAHUB, "127.0.0.1", 10000, region);
-        assertEquals("Address 127.0.0.1 should be used over " + expectedApiServer, client6.getAddress(), DATAHUB_IP);
+        assertEquals(client6.getAddress(), DATAHUB_IP, "Address 127.0.0.1 should be used over " + expectedApiServer);
     }
 
     @Test
     public void testGetPort() {
         InsightOpsClient client = new InsightOpsClient(USE_HTTP_PUT, USE_SSL, USE_DATAHUB, "127.0.0.1", 10000, "eu");
-        assertEquals("Port 10000 should be used over 443", client.getPort(), DATAHUB_PORT);
+        assertEquals(client.getPort(), DATAHUB_PORT, "Port 10000 should be used over 443");
 
         InsightOpsClient client2 = new InsightOpsClient(NOT_USE_HTTP_PUT, NOT_USE_SSL, USE_DATAHUB, "127.0.0.1", 10000, "eu");
-        assertEquals("Port 10000 should be used over 80", client2.getPort(), DATAHUB_PORT);
+        assertEquals(client2.getPort(), DATAHUB_PORT, "Port 10000 should be used over 80");
 
         InsightOpsClient client3 = new InsightOpsClient(USE_HTTP_PUT, USE_SSL, NOT_USE_DATAHUB, "", 0, "");
-        assertEquals("Port 443 should be used for SSL over HTTP", client3.getPort(), IOPS_SSL_PORT);
+        assertEquals(client3.getPort(), IOPS_SSL_PORT, "Port 443 should be used for SSL over HTTP");
 
         InsightOpsClient client4 = new InsightOpsClient(USE_HTTP_PUT, NOT_USE_SSL, NOT_USE_DATAHUB, "", 0, "");
-        assertEquals("Port 80 should be used for HTTP PUT", client4.getPort(), IOPS_PORT);
+        assertEquals(client4.getPort(), IOPS_PORT, "Port 80 should be used for HTTP PUT");
 
         InsightOpsClient client5 = new InsightOpsClient(NOT_USE_HTTP_PUT, USE_SSL, NOT_USE_DATAHUB, "", 0, "");
-        assertEquals("Port 443 should be used for SSL over Token TCP", client5.getPort(), IOPS_SSL_PORT);
+        assertEquals(client5.getPort(), IOPS_SSL_PORT, "Port 443 should be used for SSL over Token TCP");
 
         InsightOpsClient client6 = new InsightOpsClient(NOT_USE_HTTP_PUT, NOT_USE_SSL, NOT_USE_DATAHUB, "", 0, "");
-        assertEquals("Port 80 should be used for Token TCP", client6.getPort(), IOPS_PORT);
+        assertEquals(client6.getPort(), IOPS_PORT, "Port 80 should be used for Token TCP");
 
         InsightOpsClient client7 = new InsightOpsClient(NOT_USE_HTTP_PUT, NOT_USE_SSL, NOT_USE_DATAHUB, "", 10000, "");
-        assertEquals("Port 10000 should be used because specified in the configuration", client7.getPort(), 10000);
+        assertEquals(client7.getPort(), 10000, "Port 10000 should be used because specified in the configuration");
 
         InsightOpsClient client8 = new InsightOpsClient(NOT_USE_HTTP_PUT, USE_SSL, NOT_USE_DATAHUB, "", 10000, "");
-        assertEquals("Port 10000 should be used because specified in the configuration", client8.getPort(), 10000);
+        assertEquals(client8.getPort(), 10000, "Port 10000 should be used because specified in the configuration");
     }
 
 }

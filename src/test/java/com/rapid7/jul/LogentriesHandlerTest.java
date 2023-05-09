@@ -2,8 +2,8 @@ package com.rapid7.jul;
 
 
 import com.rapid7.util.SocketChannelReceiver;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -12,7 +12,7 @@ import static com.rapid7.util.LogMessageValidator.validateLogMessage;
 
 public class LogentriesHandlerTest {
 
-    @After
+    @AfterEach
     public void cleanUpConfiguration() {
         LogManager.getLogManager().reset();
     }

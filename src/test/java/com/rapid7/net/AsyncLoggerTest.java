@@ -1,13 +1,14 @@
 package com.rapid7.net;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
@@ -23,15 +24,15 @@ public class AsyncLoggerTest {
     @Test
     public void testConfigurationNoParams() {
         AsyncLogger async = new AsyncLogger(new LoggerConfiguration.Builder().build());
-        assertEquals("token should be empty string by default", async.getToken(), "");
-        assertEquals("region should be empty string by default", async.getRegion(), null);
-        assertFalse("httpput should be false by default", async.getHttpPut());
-        assertTrue("ssl should be false by default", async.getSsl());
-        assertEquals("key should be empty string by default", async.getKey(), null);
-        assertEquals("locaton should be empty string by default", async.getLocation(), "");
-        assertEquals("log prefix should be empty string by default", async.getLogMessagePrefix(), "");
-        assertFalse("do not use datahub as default", async.getUseDataHub());
-        assertEquals("hostname should be empty", async.getHostName(), null);
+        assertEquals(async.getToken(), "", "token should be empty string by default");
+        assertEquals(async.getRegion(), null, "region should be empty string by default");
+        assertFalse(async.getHttpPut(), "httpput should be false by default");
+        assertTrue(async.getSsl(), "ssl should be false by default");
+        assertEquals(async.getKey(), null, "key should be empty string by default");
+        assertEquals(async.getLocation(), "", "locaton should be empty string by default");
+        assertEquals(async.getLogMessagePrefix(), "", "log prefix should be empty string by default");
+        assertFalse(async.getUseDataHub(), "do not use datahub as default");
+        assertEquals(async.getHostName(), null, "hostname should be empty");
     }
 
     @Test
@@ -42,7 +43,7 @@ public class AsyncLoggerTest {
                         .setLogIdPrefix("LogId")
                         .useAsHostName("localhost")
                         .build());
-        assertEquals("log prefix should be set", async.getLogMessagePrefix(), "LogId HostName=localhost ");
+        assertEquals(async.getLogMessagePrefix(), "LogId HostName=localhost ", "log prefix should be set");
     }
 
     @Test
@@ -51,7 +52,7 @@ public class AsyncLoggerTest {
                 new LoggerConfiguration.Builder()
                         .logHostNameAsPrefix(true)
                         .build());
-        assertTrue("log prefix should be set", async.getLogMessagePrefix().contains("HostName="));
+        assertTrue(async.getLogMessagePrefix().contains("HostName="), "log prefix should be set");
     }
 
     @Test
@@ -75,7 +76,7 @@ public class AsyncLoggerTest {
                 new LoggerConfiguration.Builder()
                         .useToken("LOGENTRIES_TOKEN")
                         .build());
-        assertFalse("checkCredentials should return false for default token string", async.checkCredentials());
+        assertFalse(async.checkCredentials(), "checkCredentials should return false for default token string");
     }
 
     @Test
@@ -84,7 +85,7 @@ public class AsyncLoggerTest {
                 new LoggerConfiguration.Builder()
                         .useToken(VALID_UUID)
                         .build());
-        assertFalse("checkCredentials should return false for null region", async.checkCredentials());
+        assertFalse(async.checkCredentials(), "checkCredentials should return false for null region");
     }
 
     @Test
@@ -94,7 +95,7 @@ public class AsyncLoggerTest {
                         .useToken(VALID_UUID)
                         .inRegion("eu")
                         .build());
-        assertTrue("checkCredentials should return true for valid token", async.checkCredentials());
+        assertTrue(async.checkCredentials(),"checkCredentials should return true for valid token");
     }
 
     @Test
@@ -104,7 +105,7 @@ public class AsyncLoggerTest {
                         .useHttpPut(true)
                         .httpPutLocation("location")
                         .build());
-        assertFalse("checkCredentials should return false for missing key", async.checkCredentials());
+        assertFalse(async.checkCredentials(),"checkCredentials should return false for missing key");
     }
 
     @Test
@@ -116,7 +117,7 @@ public class AsyncLoggerTest {
                         .useAccountKey("not-a-uuid")
                         .httpPutLocation("anywhere")
                         .build());
-        assertFalse("checkCredentials should return false for invalid key", async.checkCredentials());
+        assertFalse(async.checkCredentials(), "checkCredentials should return false for invalid key");
     }
 
     @Test
@@ -128,7 +129,7 @@ public class AsyncLoggerTest {
                         .useAccountKey(VALID_UUID)
                         .httpPutLocation("anywhere")
                         .build());
-        assertTrue("checkCredentials should return true for valid key", async.checkCredentials());
+        assertTrue(async.checkCredentials(), "checkCredentials should return true for valid key");
     }
 
 
@@ -138,26 +139,30 @@ public class AsyncLoggerTest {
                 new LoggerConfiguration.Builder()
                         .useToken("LOGENTRIES_TOKEN")
                         .build());
-        assertFalse("checkValidUUID should return false for an empty string", async.checkValidUUID(""));
-        assertFalse("checkValidUUID should return false for invalid uuid", async.checkValidUUID("not-a-uuid"));
-        assertTrue("checkValidUUID should return true for valid uuid", async.checkValidUUID(VALID_UUID));
+        assertFalse(async.checkValidUUID(""), "checkValidUUID should return false for an empty string");
+        assertFalse(async.checkValidUUID("not-a-uuid"), "checkValidUUID should return false for invalid uuid");
+        assertTrue(async.checkValidUUID(VALID_UUID), "checkValidUUID should return true for valid uuid");
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void testOpenConnectionIOExceptionIsNotMasked() throws Exception {
         InsightOpsClient client = mock(InsightOpsClient.class);
-        doThrow(IOException.class).when(client).connect();
 
-        TEST_LOGGER.getAppender().iopsClient = client;
-        TEST_LOGGER.getAppender().openConnection();
+        assertThrows(IOException.class, () -> {
+            doThrow(IOException.class).when(client).connect();
+            TEST_LOGGER.getAppender().iopsClient = client;
+            TEST_LOGGER.getAppender().openConnection();
+        });
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testReopenConnectionExceptionThrown() throws Exception {
         InsightOpsClient client = mock(InsightOpsClient.class);
-        doThrow(RuntimeException.class).when(client).connect();
 
-        TEST_LOGGER.getAppender().iopsClient = client;
-        TEST_LOGGER.getAppender().reopenConnection();
+        assertThrows(Exception.class, () -> {
+            doThrow(RuntimeException.class).when(client).connect();
+            TEST_LOGGER.getAppender().iopsClient = client;
+            TEST_LOGGER.getAppender().reopenConnection();
+        });
     }
 }

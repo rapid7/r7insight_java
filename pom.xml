@@ -18,7 +18,7 @@
     <artifactId>r7insight_java</artifactId>
     <packaging>jar</packaging>
     <name>r7insight_java</name>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
     <description>Contains logback and log4j2 appenders that will send log data to Logentries</description>
     <url>https://github.com/rapid7/r7insight_java</url>
 
@@ -34,7 +34,7 @@
         <connection>scm:git:git@github.com:rapid7/r7insight_java.git</connection>
         <developerConnection>scm:git:git@github.com:rapid7/r7insight_java.git</developerConnection>
         <url>https://github.com/rapid7/r7insight_java</url>
-        <tag>HEAD</tag>
+        <tag>4.0.0</tag>
     </scm>
 
     <developers>

@@ -22,18 +22,18 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class LogentriesAccessAppender extends LogentriesAppenderBase<IAccessEvent, PatternLayout> {
 
-  /**
-   * Default Suffix Pattern
-   */
-  public static final String DEFAULT_SUFFIX_PATTERN = "%h %l %u [%t] \"%r\" %s %b";
+    /**
+     * Default Suffix Pattern
+     */
+    public static final String DEFAULT_SUFFIX_PATTERN = "%h %l %u [%t] \"%r\" %s %b";
 
-  @Override
-  public PatternLayout getPatternLayout() {
-    return new PatternLayout();
-  }
+    @Override
+    public PatternLayout getPatternLayout() {
+      return new PatternLayout();
+    }
 
-  @Override
-  public String getDefaultSuffixPattern() {
-    return DEFAULT_SUFFIX_PATTERN;
-  }
+    @Override
+    public String getDefaultSuffixPattern() {
+      return DEFAULT_SUFFIX_PATTERN;
+    }
 }

@@ -26,7 +26,7 @@ public abstract class LogentriesAppenderBase<E extends DeferredProcessingAware,C
   /**
    * Asynchronous Background logger
    */
-  AsyncLogger iopsAsync;
+  public AsyncLogger iopsAsync;
 
   private final LoggerConfiguration.Builder configurationBuilder;
   /**
@@ -244,7 +244,7 @@ public abstract class LogentriesAppenderBase<E extends DeferredProcessingAware,C
    * @param event event to log
    */
   @Override
-  protected void append(E event) {
+  public void append(E event) {
     // Render the event according to layout
     byte[] encodedEvent = encoder.encode(event);
     String formattedEvent;

@@ -60,3 +60,18 @@ Logentries handler configuration (e.g. to support different tokens).
     Logger logger1 = Logger.getLogger("logger1");
     Logger logger2 = Logger.getLogger("logger2");
     ```
+-------
+
+Logback Access Events
+==================
+This library allows you to setup logback access events, as part of the standard logback distribution, with Servlet 
+containers such as Jetty or Tomcat to provide HTTP-access log functionality.
+
+Instructions to setup logback access events can be found in the [Official logback-access documentation](https://logback.qos.ch/access.html)
+
+After downloading the latest r7insight_java distribution, depending on your servlet container, place the r7insight_java-VERSION.jar under either :
+
+* **$TOMCAT_HOME/lib/** directory, where $TOMCAT_HOME is the folder where you have installed Tomcat.
+* **$JETTY_HOME/lib** directory, where $JETTY_HOME is the folder where you have installed Jetty.
+
+Refer to the sample logback-access.xml template provided and place the file according to the instructions in the logback-access documentation.

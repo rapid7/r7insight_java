@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <appender name="LE" class="com.rapid7.logback.access.LogentriesAccessAppender">
+        <Token>LOGENTRIES_TOKEN</Token>
+        <Region>eu</Region>
+        <Ssl>true</Ssl>
+        <encoder>
+            <pattern>combined</pattern>
+        </encoder>
+    </appender>
+
+    <appender-ref ref="LE" />
+</configuration>

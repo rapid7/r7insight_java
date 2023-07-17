@@ -1,8 +1,8 @@
-package com.rapid7.logback;
+package com.rapid7.logback.access;
 
-import ch.qos.logback.classic.PatternLayout;
+import ch.qos.logback.access.spi.IAccessEvent;
+import ch.qos.logback.access.PatternLayout;
 import ch.qos.logback.classic.pattern.SyslogStartConverter;
-import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.encoder.Encoder;
@@ -16,24 +16,24 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 /**
- * Logentries appender for logback-classic events.
+ * Logentries appender for logback-access lib.
  *
  * @author Renan Stuchi
  */
-public class LogentriesAppender extends LogentriesAppenderBase<ILoggingEvent, PatternLayout> {
+public class LogentriesAccessAppender extends LogentriesAppenderBase<IAccessEvent, PatternLayout> {
 
     /**
      * Default Suffix Pattern
      */
-    public static final String DEFAULT_SUFFIX_PATTERN = "[%thread] %logger %msg";
+    public static final String DEFAULT_SUFFIX_PATTERN = "%h %l %u [%t] \"%r\" %s %b";
 
     @Override
     public PatternLayout getPatternLayout() {
-        return new PatternLayout();
+      return new PatternLayout();
     }
 
     @Override
     public String getDefaultSuffixPattern() {
-        return DEFAULT_SUFFIX_PATTERN;
+      return DEFAULT_SUFFIX_PATTERN;
     }
 }

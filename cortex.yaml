@@ -1,0 +1,15 @@
+---
+info:
+  title: R7insight Java
+  description: Java logging support for InsightOps
+  x-cortex-git:
+    github:
+      alias: r7org
+      repository: rapid7/r7insight_java
+  x-cortex-tag: r7insight-java
+  x-cortex-type: service
+  x-cortex-domain-parents:
+  - tag: insightidr
+openapi: 3.0.1
+servers:
+- url: "/"
